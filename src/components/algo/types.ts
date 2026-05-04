@@ -78,6 +78,8 @@ export const STRATEGIES: Strategy[] = [
   },
   {
     id: "pullback-pro",
+    locked: true,
+    price: 499,
     name: "Pullback Pro",
     tagline: "Buy options on pullbacks in strong trends",
     level: "Intermediate",
