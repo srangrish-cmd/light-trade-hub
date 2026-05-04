@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Activity, Pause, Play, Square, TrendingUp, Plus, Rocket, FlaskConical } from "lucide-react";
+import { Activity, Pause, Play, Square, TrendingUp, TrendingDown, Plus, Rocket, FlaskConical, CheckCircle2, Clock, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/trading")({ component: Trading });
 
