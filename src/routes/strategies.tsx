@@ -218,7 +218,16 @@ function StepLearn({ strategy, done, setDone, onBack, onNext }: { strategy: Stra
   const allDone = done.length === strategy.lessons.length;
   return (
     <div className="space-y-5">
-      <Header title={strategy.name} subtitle="Learn the strategy in 3 short lessons" onBack={onBack} action={<Bookmark className="h-5 w-5 text-muted-foreground" />} />
+      <Header
+        title={strategy.name}
+        subtitle="Learn the strategy in 3 short lessons"
+        onBack={onBack}
+        action={
+          <button className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:border-primary hover:text-primary">
+            <BarChart3 className="h-3.5 w-3.5" /> Backtest Now
+          </button>
+        }
+      />
 
       <div className="flex items-center justify-center gap-2">
         {strategy.lessons.map((_, i) => (
