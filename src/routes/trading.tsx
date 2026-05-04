@@ -100,6 +100,7 @@ const ACTIVITY: TradeActivity[] = [
 
 function Trading() {
   const [filter, setFilter] = useState<"all" | Mode>("all");
+  const [tab, setTab] = useState<"deployments" | "activity">("deployments");
   const list = filter === "all" ? DEPLOYMENTS : DEPLOYMENTS.filter((d) => d.mode === filter);
 
   const totalPnl = DEPLOYMENTS.reduce((s, d) => s + d.pnl, 0);
