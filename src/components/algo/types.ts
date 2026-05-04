@@ -106,6 +106,8 @@ export const STRATEGIES: Strategy[] = [
   },
   {
     id: "trend-continuation",
+    locked: true,
+    price: 999,
     name: "Trend Continuation",
     tagline: "Ride the trend using confirmations & momentum",
     level: "Advanced",
