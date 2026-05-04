@@ -147,37 +147,58 @@ function StepStrategy({ onBack, onSelect }: { onBack: () => void; onSelect: (s: 
         ))}
       </div>
       <div className="grid gap-4">
-        {STRATEGIES.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => onSelect(s)}
-            className="group rounded-2xl border border-border bg-card p-5 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)]"
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft text-xl">{s.icon}</div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="font-display text-lg font-bold">{s.name}</div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+        {STRATEGIES.map((s) => {
+          const locked = !!s.locked;
+          return (
+            <button
+              key={s.id}
+              onClick={() => { if (!locked) onSelect(s); }}
+              className={`group relative rounded-2xl border border-border bg-card p-5 text-left transition-all ${
+                locked ? "cursor-not-allowed" : "hover:border-primary hover:shadow-[var(--shadow-card)]"
+              }`}
+            >
+              {locked && (
+                <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-foreground/90 px-2.5 py-1 text-[10px] font-semibold text-background">
+                  <Lock className="h-3 w-3" /> PRO
                 </div>
-                <div className="mt-1 flex flex-wrap gap-1.5">
-                  <Badge>{s.level}</Badge>
-                  <Badge tone="primary">{s.probability}</Badge>
+              )}
+              <div className={locked ? "opacity-60" : ""}>
+                <div className="flex items-start gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft text-xl">{s.icon}</div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-display text-lg font-bold">{s.name}</div>
+                      {!locked && <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />}
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-1.5">
+                      <Badge>{s.level}</Badge>
+                      <Badge tone="primary">{s.probability}</Badge>
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-3 text-sm text-muted-foreground">{s.tagline}</p>
+                <div className="mt-3 flex items-end justify-between gap-4">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Win Rate</div>
+                    <div className="text-2xl font-display font-bold text-primary">{s.winRate}%</div>
+                  </div>
+                  <div className="w-32">
+                    <MiniChart trend="up" />
+                  </div>
                 </div>
               </div>
-            </div>
-            <p className="mt-3 text-sm text-muted-foreground">{s.tagline}</p>
-            <div className="mt-3 flex items-end justify-between gap-4">
-              <div>
-                <div className="text-xs text-muted-foreground">Win Rate</div>
-                <div className="text-2xl font-display font-bold text-primary">{s.winRate}%</div>
-              </div>
-              <div className="w-32">
-                <MiniChart trend="up" />
-              </div>
-            </div>
-          </button>
-        ))}
+              {locked && (
+                <div
+                  role="button"
+                  onClick={(e) => { e.stopPropagation(); alert(`Unlock ${s.name} for ₹${s.price}`); }}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-foreground py-2.5 text-sm font-semibold text-background hover:opacity-90"
+                >
+                  <Lock className="h-4 w-4" /> Unlock for ₹{s.price}
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
       <div className="rounded-2xl border border-dashed border-border bg-card p-4 flex items-center gap-3">
         <Sparkles className="h-5 w-5 text-primary" />
