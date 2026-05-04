@@ -56,7 +56,7 @@ function Index() {
           />
         )}
         {step === 4 && strategy && (
-          <StepComplete strategy={strategy} answers={answers} onBack={() => goto(3)} onNext={() => { setChecks(strategy.checks.map(() => false)); goto(5); }} />
+          <StepComplete strategy={strategy} answers={answers} onBack={() => goto(3)} onNext={() => { setChecks(strategy.checks.map(() => true)); goto(5); }} />
         )}
         {step === 5 && strategy && (
           <StepDeploy strategy={strategy} checks={checks} setChecks={setChecks} onBack={() => goto(4)} onDeployed={() => goto(0)} />
