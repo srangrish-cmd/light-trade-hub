@@ -125,6 +125,9 @@ function Trading() {
         </div>
       </div>
 
+      {/* Activity Log — today's triggered trades */}
+      <ActivityLog />
+
       {/* Filters */}
       <div className="flex gap-2 overflow-x-auto">
         {(["all", "live", "forward", "stopped"] as const).map((f) => (
