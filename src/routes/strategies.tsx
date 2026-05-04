@@ -453,12 +453,33 @@ function StepDeploy({ strategy, checks, setChecks, onBack, onDeployed }: any) {
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-5">
+        <div className="mb-3 text-sm font-semibold">Lot Multiplier</div>
+        <div className="flex items-center justify-between gap-4">
+          <button
+            onClick={() => setMultiplier(Math.max(1, multiplier - 1))}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-lg font-semibold hover:border-primary disabled:opacity-50"
+            disabled={multiplier <= 1}
+          >−</button>
+          <div className="text-center">
+            <div className="font-display text-3xl font-bold">{multiplier}</div>
+            <div className="text-xs text-muted-foreground">Lot{multiplier > 1 ? "s" : ""}</div>
+          </div>
+          <button
+            onClick={() => setMultiplier(Math.min(10, multiplier + 1))}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-lg font-semibold hover:border-primary disabled:opacity-50"
+            disabled={multiplier >= 10}
+          >+</button>
+        </div>
+        <p className="mt-3 text-center text-xs text-muted-foreground">Capital & risk scale with lots</p>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-5">
         <div className="mb-3 text-sm font-semibold">Deployment Details</div>
         <dl className="space-y-3 text-sm">
           {[
-            ["Required Capital", `₹${strategy.capital.toLocaleString("en-IN")}`],
-            ["Lot Multiplier", `${strategy.lots} Lot`],
-            ["Max Risk Per Trade", strategy.maxRisk],
+            ["Required Capital", `₹${capital.toLocaleString("en-IN")}`],
+            ["Lot Multiplier", `${multiplier} Lot${multiplier > 1 ? "s" : ""}`],
+            ["Max Risk Per Trade", scaledRisk],
             ["Suitable For", strategy.suitable],
             ["Strategy Type", strategy.type],
             ["Timeframe", strategy.timeframe],
