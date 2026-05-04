@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TradingRouteImport } from './routes/trading'
 import { Route as StrategiesRouteImport } from './routes/strategies'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as BacktestRouteImport } from './routes/backtest'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TradingRoute = TradingRouteImport.update({
@@ -29,6 +30,11 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BacktestRoute = BacktestRouteImport.update({
+  id: '/backtest',
+  path: '/backtest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,12 +43,14 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/backtest': typeof BacktestRoute
   '/profile': typeof ProfileRoute
   '/strategies': typeof StrategiesRoute
   '/trading': typeof TradingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/backtest': typeof BacktestRoute
   '/profile': typeof ProfileRoute
   '/strategies': typeof StrategiesRoute
   '/trading': typeof TradingRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/backtest': typeof BacktestRoute
   '/profile': typeof ProfileRoute
   '/strategies': typeof StrategiesRoute
   '/trading': typeof TradingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/profile' | '/strategies' | '/trading'
+  fullPaths: '/' | '/backtest' | '/profile' | '/strategies' | '/trading'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/profile' | '/strategies' | '/trading'
-  id: '__root__' | '/' | '/profile' | '/strategies' | '/trading'
+  to: '/' | '/backtest' | '/profile' | '/strategies' | '/trading'
+  id: '__root__' | '/' | '/backtest' | '/profile' | '/strategies' | '/trading'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BacktestRoute: typeof BacktestRoute
   ProfileRoute: typeof ProfileRoute
   StrategiesRoute: typeof StrategiesRoute
   TradingRoute: typeof TradingRoute
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/backtest': {
+      id: '/backtest'
+      path: '/backtest'
+      fullPath: '/backtest'
+      preLoaderRoute: typeof BacktestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +121,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BacktestRoute: BacktestRoute,
   ProfileRoute: ProfileRoute,
   StrategiesRoute: StrategiesRoute,
   TradingRoute: TradingRoute,
