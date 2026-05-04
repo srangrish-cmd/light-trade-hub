@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Bookmark, Check, ChevronRight, Home, BookOpen, User, BarChart3, Play, Lock, Rocket, TrendingUp, TrendingDown, Activity, ShieldCheck, Sparkles } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Stepper } from "@/components/algo/Stepper";
 import { MiniChart } from "@/components/algo/MiniChart";
 import { STRATEGIES, type AlgoType, type Strategy } from "@/components/algo/types";
@@ -223,9 +224,9 @@ function StepLearn({ strategy, done, setDone, onBack, onNext }: { strategy: Stra
         subtitle="Learn the strategy in 3 short lessons"
         onBack={onBack}
         action={
-          <button className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:border-primary hover:text-primary">
+          <Link to="/backtest" search={{ id: strategy.id }} className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:border-primary hover:text-primary">
             <BarChart3 className="h-3.5 w-3.5" /> Backtest Now
-          </button>
+          </Link>
         }
       />
 
