@@ -21,32 +21,13 @@ function Index() {
   const goto = (s: Step) => setStep(s);
 
   return (
-    <div className="min-h-screen bg-surface">
-      {/* Top nav */}
-      <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">A</div>
-            <span className="text-lg font-display font-bold tracking-tight">Algoo</span>
-          </div>
-          <nav className="hidden items-center gap-7 md:flex text-sm font-medium text-muted-foreground">
-            <a className="text-foreground">Home</a>
-            <a>My Strategies</a>
-            <a>Learn</a>
-            <a>Profile</a>
-          </nav>
-          <button className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
-            <User className="h-4 w-4" />
-          </button>
-        </div>
-      </header>
-
+    <div>
       {/* Stepper */}
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
         <Stepper current={step} />
       </div>
 
-      <main className="mx-auto max-w-3xl px-4 pb-24 sm:px-6">
+      <div className="mx-auto max-w-3xl px-4 pb-10 sm:px-6">
         {step === 0 && <StepAlgoType selected={algoType} onSelect={(a) => { setAlgoType(a); goto(1); }} />}
         {step === 1 && (
           <StepStrategy
@@ -80,24 +61,7 @@ function Index() {
         {step === 5 && strategy && (
           <StepDeploy strategy={strategy} checks={checks} setChecks={setChecks} onBack={() => goto(4)} onDeployed={() => goto(0)} />
         )}
-      </main>
-
-      {/* Bottom nav (mobile feel) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-background md:hidden">
-        <div className="mx-auto flex max-w-md items-center justify-around px-2 py-2">
-          {[
-            { icon: Home, label: "Home", active: true },
-            { icon: BarChart3, label: "Strategies" },
-            { icon: BookOpen, label: "Learn" },
-            { icon: User, label: "Profile" },
-          ].map((it) => (
-            <button key={it.label} className={`flex flex-1 flex-col items-center gap-0.5 rounded-lg py-1.5 text-xs ${it.active ? "text-primary" : "text-muted-foreground"}`}>
-              <it.icon className="h-5 w-5" />
-              {it.label}
-            </button>
-          ))}
-        </div>
-      </nav>
+      </div>
     </div>
   );
 }
