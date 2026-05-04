@@ -410,6 +410,13 @@ function StepDeploy({ strategy, checks, setChecks, onBack, onDeployed }: any) {
   const allChecked = checks.length > 0 && checks.every(Boolean);
   const [deploying, setDeploying] = useState(false);
   const [deployed, setDeployed] = useState(false);
+  const [multiplier, setMultiplier] = useState<number>(strategy.lots);
+  const factor = multiplier / strategy.lots;
+  const capital = Math.round(strategy.capital * factor);
+  const riskMatch = String(strategy.maxRisk).match(/₹([\d,]+)\s*\(([^)]+)\)/);
+  const baseRisk = riskMatch ? Number(riskMatch[1].replace(/,/g, "")) : 0;
+  const riskPct = riskMatch ? riskMatch[2] : "";
+  const scaledRisk = `₹${Math.round(baseRisk * factor).toLocaleString("en-IN")} (${riskPct})`;
 
   const deploy = () => {
     setDeploying(true);
