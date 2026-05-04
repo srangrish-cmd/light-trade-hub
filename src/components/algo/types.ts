@@ -15,6 +15,8 @@ export interface Strategy {
   suitable: string;
   timeframe: string;
   type: string;
+  locked?: boolean;
+  price?: number;
   lessons: { title: string; duration: string; summary: string }[];
   quiz: { question: string; options: string[]; correct: number }[];
   checks: string[];
