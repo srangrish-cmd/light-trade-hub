@@ -68,65 +68,58 @@ function Index() {
 
 /* ---------- Step 0 ---------- */
 function StepAlgoType({ selected, onSelect }: { selected: AlgoType | null; onSelect: (a: AlgoType) => void }) {
-  const groups = [
+  const options = [
     {
+      id: "option-buying" as AlgoType,
       title: "Trending Market",
-      desc: "For markets showing clear direction",
+      desc: "Pick this when the market has a clear up or down direction.",
+      example: "Example: Nifty rallying 2% on strong news",
       icon: TrendingUp,
-      options: [
-        { id: "option-buying" as AlgoType, label: "Option Buying", desc: "Buy options to profit from strong moves", tag: "BUY", tone: "up" },
-        { id: "option-selling" as AlgoType, label: "Option Selling", desc: "Sell options in trending market for premium", tag: "SELL", tone: "down" },
-      ],
+      tone: "up" as const,
     },
     {
+      id: "option-selling-only" as AlgoType,
       title: "Non-Trending Market",
-      desc: "For sideways or range bound markets",
+      desc: "Pick this when the market is moving sideways in a range.",
+      example: "Example: Nifty stuck between 22,000 – 22,300",
       icon: Activity,
-      options: [
-        { id: "option-selling-only" as AlgoType, label: "Option Selling Only", desc: "Sell options and collect premium in range", tag: "STILL", tone: "flat" },
-      ],
+      tone: "flat" as const,
     },
   ];
   return (
     <div className="space-y-6">
-      <Header
-        title="Select Algo Type"
-        subtitle="Pick the market condition that matches your view"
-      />
-      {groups.map((g) => (
-        <section key={g.title} className="space-y-3">
-          <div className="flex items-center gap-2">
-            <g.icon className="h-4 w-4 text-primary" />
-            <h3 className="text-sm font-semibold">{g.title}</h3>
-            <span className="text-xs text-muted-foreground">— {g.desc}</span>
-          </div>
-          <div className="grid gap-3">
-            {g.options.map((o) => (
-              <button
-                key={o.id}
-                onClick={() => onSelect(o.id)}
-                className={`group flex items-center gap-4 rounded-2xl border bg-card p-4 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)] ${
-                  selected === o.id ? "border-primary ring-4 ring-primary-soft" : "border-border"
-                }`}
-              >
-                <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${o.tone === "down" ? "bg-destructive/10 text-destructive" : "bg-primary-soft text-primary"}`}>
-                  <span className="text-[10px] font-bold tracking-wider">{o.tag}</span>
+      <Header title="What's the market doing today?" subtitle="Pick one to see strategies that fit" />
+      <div className="grid gap-4">
+        {options.map((o) => {
+          const active = selected === o.id;
+          return (
+            <button
+              key={o.id}
+              onClick={() => onSelect(o.id)}
+              className={`group relative overflow-hidden rounded-3xl border bg-card p-6 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)] ${
+                active ? "border-primary ring-4 ring-primary-soft" : "border-border"
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+                  <o.icon className="h-7 w-7" />
                 </div>
                 <div className="flex-1">
-                  <div className="font-semibold">{o.label}</div>
-                  <div className="text-sm text-muted-foreground">{o.desc}</div>
+                  <div className="font-display text-xl font-bold">{o.title}</div>
+                  <p className="mt-1 text-sm text-muted-foreground">{o.desc}</p>
+                  <p className="mt-2 text-xs italic text-muted-foreground">{o.example}</p>
                 </div>
                 <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-              </button>
-            ))}
-          </div>
-        </section>
-      ))}
+              </div>
+            </button>
+          );
+        })}
+      </div>
       <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
         <ShieldCheck className="h-5 w-5 text-primary" />
         <div className="flex-1 text-sm">
           <div className="font-medium">Not sure which to choose?</div>
-          <div className="text-muted-foreground">Learn more about market conditions</div>
+          <div className="text-muted-foreground">Tap to learn how to spot each market</div>
         </div>
         <button className="text-sm font-semibold text-primary">Learn more</button>
       </div>
