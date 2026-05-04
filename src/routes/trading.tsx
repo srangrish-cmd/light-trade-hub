@@ -26,6 +26,77 @@ const DEPLOYMENTS: Deployment[] = [
   { id: "4", name: "Iron Condor", type: "Non-Trending • Option Selling", mode: "stopped", pnl: 0, pnlPct: 0, trades: 0, winRate: 0, capital: 250000, deployedAt: "—" },
 ];
 
+interface ActivityEntry {
+  id: string;
+  time: string;
+  algo: string;
+  setup: string;
+  side: "BUY" | "SELL";
+  instrument: string;
+  entry: number;
+  qty: number;
+  status: "open" | "closed";
+  pnl?: number;
+  conditions: string[];
+  exitReason?: string;
+}
+
+const ACTIVITY: ActivityEntry[] = [
+  {
+    id: "a1",
+    time: "10:24 AM",
+    algo: "Momentum Breakout",
+    setup: "Trending • 15m breakout",
+    side: "BUY",
+    instrument: "NIFTY 24500 CE",
+    entry: 142.5,
+    qty: 50,
+    status: "open",
+    conditions: [
+      "Price closed above 15m ORB high",
+      "VWAP slope positive",
+      "RSI(14) crossed 60",
+      "India VIX < 14",
+    ],
+  },
+  {
+    id: "a2",
+    time: "09:52 AM",
+    algo: "Trend Continuation",
+    setup: "Trending • EMA pullback",
+    side: "BUY",
+    instrument: "BANKNIFTY 51800 CE",
+    entry: 268.0,
+    qty: 30,
+    status: "closed",
+    pnl: 1320,
+    conditions: [
+      "Price held above 20 EMA on 5m",
+      "Higher-high structure intact",
+      "Volume > 1.5× avg",
+    ],
+    exitReason: "Target 1 hit • Trailing SL closed remainder",
+  },
+  {
+    id: "a3",
+    time: "09:35 AM",
+    algo: "Pullback Pro",
+    setup: "Trending • Fib 0.5 retrace",
+    side: "SELL",
+    instrument: "NIFTY 24600 PE",
+    entry: 88.2,
+    qty: 50,
+    status: "closed",
+    pnl: -640,
+    conditions: [
+      "Retraced to 0.5 fib of prior leg",
+      "Bearish engulfing on 5m",
+      "ADX > 22",
+    ],
+    exitReason: "SL hit • Sudden reversal on positive global cues; momentum flipped before structure formed",
+  },
+];
+
 function Trading() {
   const [filter, setFilter] = useState<"all" | Mode>("all");
   const list = filter === "all" ? DEPLOYMENTS : DEPLOYMENTS.filter((d) => d.mode === filter);
