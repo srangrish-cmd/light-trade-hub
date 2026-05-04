@@ -56,7 +56,7 @@ function Index() {
           />
         )}
         {step === 4 && strategy && (
-          <StepComplete strategy={strategy} answers={answers} onBack={() => goto(3)} onNext={() => { setChecks(strategy.checks.map(() => false)); goto(5); }} />
+          <StepComplete strategy={strategy} answers={answers} onBack={() => goto(3)} onNext={() => { setChecks(strategy.checks.map(() => true)); goto(5); }} />
         )}
         {step === 5 && strategy && (
           <StepDeploy strategy={strategy} checks={checks} setChecks={setChecks} onBack={() => goto(4)} onDeployed={() => goto(0)} />
@@ -68,65 +68,58 @@ function Index() {
 
 /* ---------- Step 0 ---------- */
 function StepAlgoType({ selected, onSelect }: { selected: AlgoType | null; onSelect: (a: AlgoType) => void }) {
-  const groups = [
+  const options = [
     {
+      id: "option-buying" as AlgoType,
       title: "Trending Market",
-      desc: "For markets showing clear direction",
+      desc: "Pick this when the market has a clear up or down direction.",
+      example: "Example: Nifty rallying 2% on strong news",
       icon: TrendingUp,
-      options: [
-        { id: "option-buying" as AlgoType, label: "Option Buying", desc: "Buy options to profit from strong moves", tag: "BUY", tone: "up" },
-        { id: "option-selling" as AlgoType, label: "Option Selling", desc: "Sell options in trending market for premium", tag: "SELL", tone: "down" },
-      ],
+      tone: "up" as const,
     },
     {
+      id: "option-selling-only" as AlgoType,
       title: "Non-Trending Market",
-      desc: "For sideways or range bound markets",
+      desc: "Pick this when the market is moving sideways in a range.",
+      example: "Example: Nifty stuck between 22,000 – 22,300",
       icon: Activity,
-      options: [
-        { id: "option-selling-only" as AlgoType, label: "Option Selling Only", desc: "Sell options and collect premium in range", tag: "STILL", tone: "flat" },
-      ],
+      tone: "flat" as const,
     },
   ];
   return (
     <div className="space-y-6">
-      <Header
-        title="Select Algo Type"
-        subtitle="Pick the market condition that matches your view"
-      />
-      {groups.map((g) => (
-        <section key={g.title} className="space-y-3">
-          <div className="flex items-center gap-2">
-            <g.icon className="h-4 w-4 text-primary" />
-            <h3 className="text-sm font-semibold">{g.title}</h3>
-            <span className="text-xs text-muted-foreground">— {g.desc}</span>
-          </div>
-          <div className="grid gap-3">
-            {g.options.map((o) => (
-              <button
-                key={o.id}
-                onClick={() => onSelect(o.id)}
-                className={`group flex items-center gap-4 rounded-2xl border bg-card p-4 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)] ${
-                  selected === o.id ? "border-primary ring-4 ring-primary-soft" : "border-border"
-                }`}
-              >
-                <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${o.tone === "down" ? "bg-destructive/10 text-destructive" : "bg-primary-soft text-primary"}`}>
-                  <span className="text-[10px] font-bold tracking-wider">{o.tag}</span>
+      <Header title="What's the market doing today?" subtitle="Pick one to see strategies that fit" />
+      <div className="grid gap-4">
+        {options.map((o) => {
+          const active = selected === o.id;
+          return (
+            <button
+              key={o.id}
+              onClick={() => onSelect(o.id)}
+              className={`group relative overflow-hidden rounded-3xl border bg-card p-6 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)] ${
+                active ? "border-primary ring-4 ring-primary-soft" : "border-border"
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+                  <o.icon className="h-7 w-7" />
                 </div>
                 <div className="flex-1">
-                  <div className="font-semibold">{o.label}</div>
-                  <div className="text-sm text-muted-foreground">{o.desc}</div>
+                  <div className="font-display text-xl font-bold">{o.title}</div>
+                  <p className="mt-1 text-sm text-muted-foreground">{o.desc}</p>
+                  <p className="mt-2 text-xs italic text-muted-foreground">{o.example}</p>
                 </div>
                 <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-              </button>
-            ))}
-          </div>
-        </section>
-      ))}
+              </div>
+            </button>
+          );
+        })}
+      </div>
       <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
         <ShieldCheck className="h-5 w-5 text-primary" />
         <div className="flex-1 text-sm">
           <div className="font-medium">Not sure which to choose?</div>
-          <div className="text-muted-foreground">Learn more about market conditions</div>
+          <div className="text-muted-foreground">Tap to learn how to spot each market</div>
         </div>
         <button className="text-sm font-semibold text-primary">Learn more</button>
       </div>
@@ -154,37 +147,58 @@ function StepStrategy({ onBack, onSelect }: { onBack: () => void; onSelect: (s: 
         ))}
       </div>
       <div className="grid gap-4">
-        {STRATEGIES.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => onSelect(s)}
-            className="group rounded-2xl border border-border bg-card p-5 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)]"
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft text-xl">{s.icon}</div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="font-display text-lg font-bold">{s.name}</div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+        {STRATEGIES.map((s) => {
+          const locked = !!s.locked;
+          return (
+            <button
+              key={s.id}
+              onClick={() => { if (!locked) onSelect(s); }}
+              className={`group relative rounded-2xl border border-border bg-card p-5 text-left transition-all ${
+                locked ? "cursor-not-allowed" : "hover:border-primary hover:shadow-[var(--shadow-card)]"
+              }`}
+            >
+              {locked && (
+                <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-foreground/90 px-2.5 py-1 text-[10px] font-semibold text-background">
+                  <Lock className="h-3 w-3" /> PRO
                 </div>
-                <div className="mt-1 flex flex-wrap gap-1.5">
-                  <Badge>{s.level}</Badge>
-                  <Badge tone="primary">{s.probability}</Badge>
+              )}
+              <div className={locked ? "opacity-60" : ""}>
+                <div className="flex items-start gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft text-xl">{s.icon}</div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-display text-lg font-bold">{s.name}</div>
+                      {!locked && <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />}
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-1.5">
+                      <Badge>{s.level}</Badge>
+                      <Badge tone="primary">{s.probability}</Badge>
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-3 text-sm text-muted-foreground">{s.tagline}</p>
+                <div className="mt-3 flex items-end justify-between gap-4">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Win Rate</div>
+                    <div className="text-2xl font-display font-bold text-primary">{s.winRate}%</div>
+                  </div>
+                  <div className="w-32">
+                    <MiniChart trend="up" />
+                  </div>
                 </div>
               </div>
-            </div>
-            <p className="mt-3 text-sm text-muted-foreground">{s.tagline}</p>
-            <div className="mt-3 flex items-end justify-between gap-4">
-              <div>
-                <div className="text-xs text-muted-foreground">Win Rate</div>
-                <div className="text-2xl font-display font-bold text-primary">{s.winRate}%</div>
-              </div>
-              <div className="w-32">
-                <MiniChart trend="up" />
-              </div>
-            </div>
-          </button>
-        ))}
+              {locked && (
+                <div
+                  role="button"
+                  onClick={(e) => { e.stopPropagation(); alert(`Unlock ${s.name} for ₹${s.price}`); }}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-foreground py-2.5 text-sm font-semibold text-background hover:opacity-90"
+                >
+                  <Lock className="h-4 w-4" /> Unlock for ₹{s.price}
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
       <div className="rounded-2xl border border-dashed border-border bg-card p-4 flex items-center gap-3">
         <Sparkles className="h-5 w-5 text-primary" />
@@ -204,7 +218,16 @@ function StepLearn({ strategy, done, setDone, onBack, onNext }: { strategy: Stra
   const allDone = done.length === strategy.lessons.length;
   return (
     <div className="space-y-5">
-      <Header title={strategy.name} subtitle="Learn the strategy in 3 short lessons" onBack={onBack} action={<Bookmark className="h-5 w-5 text-muted-foreground" />} />
+      <Header
+        title={strategy.name}
+        subtitle="Learn the strategy in 3 short lessons"
+        onBack={onBack}
+        action={
+          <button className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:border-primary hover:text-primary">
+            <BarChart3 className="h-3.5 w-3.5" /> Backtest Now
+          </button>
+        }
+      />
 
       <div className="flex items-center justify-center gap-2">
         {strategy.lessons.map((_, i) => (
@@ -387,6 +410,13 @@ function StepDeploy({ strategy, checks, setChecks, onBack, onDeployed }: any) {
   const allChecked = checks.length > 0 && checks.every(Boolean);
   const [deploying, setDeploying] = useState(false);
   const [deployed, setDeployed] = useState(false);
+  const [multiplier, setMultiplier] = useState<number>(strategy.lots);
+  const factor = multiplier / strategy.lots;
+  const capital = Math.round(strategy.capital * factor);
+  const riskMatch = String(strategy.maxRisk).match(/₹([\d,]+)\s*\(([^)]+)\)/);
+  const baseRisk = riskMatch ? Number(riskMatch[1].replace(/,/g, "")) : 0;
+  const riskPct = riskMatch ? riskMatch[2] : "";
+  const scaledRisk = `₹${Math.round(baseRisk * factor).toLocaleString("en-IN")} (${riskPct})`;
 
   const deploy = () => {
     setDeploying(true);
@@ -423,12 +453,33 @@ function StepDeploy({ strategy, checks, setChecks, onBack, onDeployed }: any) {
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-5">
+        <div className="mb-3 text-sm font-semibold">Lot Multiplier</div>
+        <div className="flex items-center justify-between gap-4">
+          <button
+            onClick={() => setMultiplier(Math.max(1, multiplier - 1))}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-lg font-semibold hover:border-primary disabled:opacity-50"
+            disabled={multiplier <= 1}
+          >−</button>
+          <div className="text-center">
+            <div className="font-display text-3xl font-bold">{multiplier}</div>
+            <div className="text-xs text-muted-foreground">Lot{multiplier > 1 ? "s" : ""}</div>
+          </div>
+          <button
+            onClick={() => setMultiplier(Math.min(10, multiplier + 1))}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-lg font-semibold hover:border-primary disabled:opacity-50"
+            disabled={multiplier >= 10}
+          >+</button>
+        </div>
+        <p className="mt-3 text-center text-xs text-muted-foreground">Capital & risk scale with lots</p>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-5">
         <div className="mb-3 text-sm font-semibold">Deployment Details</div>
         <dl className="space-y-3 text-sm">
           {[
-            ["Required Capital", `₹${strategy.capital.toLocaleString("en-IN")}`],
-            ["Lot Multiplier", `${strategy.lots} Lot`],
-            ["Max Risk Per Trade", strategy.maxRisk],
+            ["Required Capital", `₹${capital.toLocaleString("en-IN")}`],
+            ["Lot Multiplier", `${multiplier} Lot${multiplier > 1 ? "s" : ""}`],
+            ["Max Risk Per Trade", scaledRisk],
             ["Suitable For", strategy.suitable],
             ["Strategy Type", strategy.type],
             ["Timeframe", strategy.timeframe],

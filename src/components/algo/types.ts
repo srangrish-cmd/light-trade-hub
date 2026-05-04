@@ -15,6 +15,8 @@ export interface Strategy {
   suitable: string;
   timeframe: string;
   type: string;
+  locked?: boolean;
+  price?: number;
   lessons: { title: string; duration: string; summary: string }[];
   quiz: { question: string; options: string[]; correct: number }[];
   checks: string[];
@@ -76,6 +78,8 @@ export const STRATEGIES: Strategy[] = [
   },
   {
     id: "pullback-pro",
+    locked: true,
+    price: 499,
     name: "Pullback Pro",
     tagline: "Buy options on pullbacks in strong trends",
     level: "Intermediate",
@@ -102,6 +106,8 @@ export const STRATEGIES: Strategy[] = [
   },
   {
     id: "trend-continuation",
+    locked: true,
+    price: 999,
     name: "Trend Continuation",
     tagline: "Ride the trend using confirmations & momentum",
     level: "Advanced",
