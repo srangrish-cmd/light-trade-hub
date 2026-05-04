@@ -26,6 +26,78 @@ const DEPLOYMENTS: Deployment[] = [
   { id: "4", name: "Iron Condor", type: "Non-Trending • Option Selling", mode: "stopped", pnl: 0, pnlPct: 0, trades: 0, winRate: 0, capital: 250000, deployedAt: "—" },
 ];
 
+type TradeStatus = "open" | "closed-win" | "closed-loss" | "sl-hit";
+interface TradeActivity {
+  id: string;
+  algo: string;
+  instrument: string;
+  side: "BUY" | "SELL";
+  qty: number;
+  entry: number;
+  exit?: number;
+  pnl?: number;
+  status: TradeStatus;
+  time: string;
+  reason: string;
+  closeReason?: string;
+}
+
+const ACTIVITY: TradeActivity[] = [
+  {
+    id: "a1",
+    algo: "Momentum Breakout",
+    instrument: "NIFTY 24500 CE",
+    side: "BUY",
+    qty: 75,
+    entry: 142.5,
+    status: "open",
+    time: "10:32 AM",
+    reason: "Price broke above 15m resistance with 1.8x avg volume; RSI > 60 confirming momentum.",
+  },
+  {
+    id: "a2",
+    algo: "Momentum Breakout",
+    instrument: "BANKNIFTY 52000 CE",
+    side: "BUY",
+    qty: 30,
+    entry: 218.0,
+    exit: 264.5,
+    pnl: 1395,
+    status: "closed-win",
+    time: "09:58 AM",
+    reason: "Breakout above opening range high with strong volume confirmation.",
+    closeReason: "Target hit at 1:2 risk-reward. Booked profit on momentum exhaustion candle.",
+  },
+  {
+    id: "a3",
+    algo: "Pullback Pro",
+    instrument: "RELIANCE 2900 CE",
+    side: "BUY",
+    qty: 250,
+    entry: 38.4,
+    exit: 30.7,
+    pnl: -1925,
+    status: "sl-hit",
+    time: "Yesterday • 02:15 PM",
+    reason: "Pullback to 20 EMA with bullish hammer in uptrend.",
+    closeReason: "SL hit — broader market reversed sharply on Fed news; trend invalidated below swing low.",
+  },
+  {
+    id: "a4",
+    algo: "Trend Continuation",
+    instrument: "NIFTY 24400 PE",
+    side: "BUY",
+    qty: 75,
+    entry: 96.0,
+    exit: 88.2,
+    pnl: -585,
+    status: "closed-loss",
+    time: "Yesterday • 11:40 AM",
+    reason: "Lower-low structure with MACD bearish crossover.",
+    closeReason: "Time-based exit — momentum stalled, no follow-through within 45 min window.",
+  },
+];
+
 function Trading() {
   const [filter, setFilter] = useState<"all" | Mode>("all");
   const list = filter === "all" ? DEPLOYMENTS : DEPLOYMENTS.filter((d) => d.mode === filter);
