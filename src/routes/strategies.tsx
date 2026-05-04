@@ -5,7 +5,7 @@ import { Stepper } from "@/components/algo/Stepper";
 import { MiniChart } from "@/components/algo/MiniChart";
 import { STRATEGIES, type AlgoType, type Strategy } from "@/components/algo/types";
 
-export const Route = createFileRoute("/")({ component: Index });
+export const Route = createFileRoute("/strategies")({ component: Index });
 
 type Step = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -415,7 +415,7 @@ function StepComplete({ strategy, answers, onBack, onNext }: any) {
       </div>
       <PrimaryNext disabled={!perfect} onClick={onNext} label={perfect ? "Deploy Strategy" : "Retake quiz to deploy"} />
     </div>
-  );
+  )
 }
 
 /* ---------- Step 5 ---------- */
