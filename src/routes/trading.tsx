@@ -127,75 +127,102 @@ function Trading() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-2 overflow-x-auto">
-        {(["all", "live", "forward", "stopped"] as const).map((f) => (
+      {/* Tabs */}
+      <div className="flex gap-1 rounded-xl border border-border bg-muted p-1">
+        {(["deployments", "activity"] as const).map((t) => (
           <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-              filter === f ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+            key={t}
+            onClick={() => setTab(t)}
+            className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+              tab === t ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
-            {f === "all" ? "All" : f === "live" ? "Live" : f === "forward" ? "Forward Test" : "Stopped"}
+            {t === "deployments" ? "Deployments" : "Activity"}
           </button>
         ))}
       </div>
 
-      {/* Deployments */}
-      <div className="space-y-3">
-        {list.map((d) => (
-          <div key={d.id} className="rounded-2xl border border-border bg-card p-5">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-display text-lg font-bold">{d.name}</h3>
-                  <ModeBadge mode={d.mode} />
-                </div>
-                <p className="text-xs text-muted-foreground">{d.type}</p>
-              </div>
-              <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-muted">
-                {d.mode === "stopped" ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+      {tab === "deployments" && (
+        <>
+          {/* Filters */}
+          <div className="flex gap-2 overflow-x-auto">
+            {(["all", "live", "forward", "stopped"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                  filter === f ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {f === "all" ? "All" : f === "live" ? "Live" : f === "forward" ? "Forward Test" : "Stopped"}
               </button>
-            </div>
+            ))}
+          </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <div>
-                <div className="text-xs text-muted-foreground">P&L</div>
-                <div className={`text-sm font-bold ${d.pnl > 0 ? "text-primary" : d.pnl < 0 ? "text-destructive" : ""}`}>
-                  {d.pnl > 0 ? "+" : ""}₹{d.pnl.toLocaleString("en-IN")}
-                  <span className="ml-1 text-xs font-medium">({d.pnlPct >= 0 ? "+" : ""}{d.pnlPct}%)</span>
+          {/* Deployments */}
+          <div className="space-y-3">
+            {list.map((d) => (
+              <div key={d.id} className="rounded-2xl border border-border bg-card p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-display text-lg font-bold">{d.name}</h3>
+                      <ModeBadge mode={d.mode} />
+                    </div>
+                    <p className="text-xs text-muted-foreground">{d.type}</p>
+                  </div>
+                  <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-muted">
+                    {d.mode === "stopped" ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+                  </button>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                  <div>
+                    <div className="text-xs text-muted-foreground">P&L</div>
+                    <div className={`text-sm font-bold ${d.pnl > 0 ? "text-primary" : d.pnl < 0 ? "text-destructive" : ""}`}>
+                      {d.pnl > 0 ? "+" : ""}₹{d.pnl.toLocaleString("en-IN")}
+                      <span className="ml-1 text-xs font-medium">({d.pnlPct >= 0 ? "+" : ""}{d.pnlPct}%)</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Trades</div>
+                    <div className="text-sm font-semibold">{d.trades}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Win Rate</div>
+                    <div className="text-sm font-semibold">{d.winRate}%</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Capital</div>
+                    <div className="text-sm font-semibold">₹{d.capital.toLocaleString("en-IN")}</div>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
+                  <span>Deployed {d.deployedAt}</span>
+                  <button className="font-semibold text-primary">View details →</button>
                 </div>
               </div>
-              <div>
-                <div className="text-xs text-muted-foreground">Trades</div>
-                <div className="text-sm font-semibold">{d.trades}</div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground">Win Rate</div>
-                <div className="text-sm font-semibold">{d.winRate}%</div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground">Capital</div>
-                <div className="text-sm font-semibold">₹{d.capital.toLocaleString("en-IN")}</div>
-              </div>
-            </div>
+            ))}
 
-            <div className="mt-3 flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
-              <span>Deployed {d.deployedAt}</span>
-              <button className="font-semibold text-primary">View details →</button>
-            </div>
+            {list.length === 0 && (
+              <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
+                <Activity className="mx-auto h-8 w-8 text-muted-foreground" />
+                <div className="mt-3 font-semibold">No deployments here</div>
+                <p className="text-sm text-muted-foreground">Try a different filter or deploy a new algo.</p>
+              </div>
+            )}
           </div>
-        ))}
+        </>
+      )}
 
-        {list.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-            <Activity className="mx-auto h-8 w-8 text-muted-foreground" />
-            <div className="mt-3 font-semibold">No deployments here</div>
-            <p className="text-sm text-muted-foreground">Try a different filter or deploy a new algo.</p>
-          </div>
-        )}
-      </div>
+      {tab === "activity" && (
+        <div className="space-y-3">
+          {ACTIVITY.map((t) => (
+            <ActivityCard key={t.id} t={t} />
+          ))}
+        </div>
+      )}
 
       <Link
         to="/strategies"
