@@ -1,10 +1,34 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, Bookmark, Check, ChevronRight, Home, BookOpen, User, BarChart3, Play, Lock, Rocket, TrendingUp, TrendingDown, Activity, ShieldCheck, Sparkles, Bot, Flame } from "lucide-react";
+import { ArrowLeft, ArrowRight, Bookmark, Check, ChevronRight, Home, BookOpen, User, BarChart3, Play, Lock, Rocket, TrendingUp, TrendingDown, Activity, ShieldCheck, Sparkles, Bot, Flame, Shield, Sparkle } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Stepper } from "@/components/algo/Stepper";
 import { MiniChart } from "@/components/algo/MiniChart";
 import { STRATEGIES, type AlgoType, type Strategy } from "@/components/algo/types";
+
+/* ---------- Strategy meta helpers ---------- */
+function getStrategyMeta(s: Strategy) {
+  const returnPct = s.winRate + Math.round((s.capital % 13) + 8);
+  const drawdown = Math.max(6, Math.round((100 - s.winRate) * 0.6));
+  const risk: "Low" | "Medium" | "High" =
+    s.level === "Beginner" ? "Low" : s.level === "Intermediate" ? "Medium" : "High";
+  const tag: "Trending" | "Safe" | "New" =
+    s.id === "iron-condor" || s.id === "range-hunter" ? "Safe"
+    : s.id === "mean-revert" ? "New"
+    : "Trending";
+  return { returnPct, drawdown, risk, tag };
+}
+
+const RISK_STYLES: Record<string, string> = {
+  Low: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  Medium: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  High: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
+};
+const TAG_STYLES: Record<string, { cls: string; icon: any }> = {
+  Trending: { cls: "bg-primary-soft text-primary", icon: Flame },
+  Safe: { cls: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400", icon: Shield },
+  New: { cls: "bg-violet-500/10 text-violet-600 dark:text-violet-400", icon: Sparkle },
+};
 
 export const Route = createFileRoute("/strategies")({ component: Index });
 
