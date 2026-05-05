@@ -1,5 +1,11 @@
 export type AlgoType = "option-buying" | "option-selling" | "option-selling-only";
-export type StrategyId = "momentum-breakout" | "pullback-pro" | "trend-continuation";
+export type StrategyId =
+  | "momentum-breakout"
+  | "pullback-pro"
+  | "trend-continuation"
+  | "iron-condor"
+  | "range-hunter"
+  | "mean-revert";
 
 export interface Strategy {
   id: StrategyId;
