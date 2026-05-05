@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, Bookmark, Check, ChevronRight, Home, BookOpen, User, BarChart3, Play, Lock, Rocket, TrendingUp, TrendingDown, Activity, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Bookmark, Check, ChevronRight, Home, BookOpen, User, BarChart3, Play, Lock, Rocket, TrendingUp, TrendingDown, Activity, ShieldCheck, Sparkles, Bot, Flame } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Stepper } from "@/components/algo/Stepper";
 import { MiniChart } from "@/components/algo/MiniChart";
