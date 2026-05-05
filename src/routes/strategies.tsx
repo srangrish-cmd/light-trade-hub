@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, Bookmark, Check, ChevronRight, Home, BookOpen, User, BarChart3, Play, Lock, Rocket, TrendingUp, TrendingDown, Activity, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Bookmark, Check, ChevronRight, Home, BookOpen, User, BarChart3, Play, Lock, Rocket, TrendingUp, TrendingDown, Activity, ShieldCheck, Sparkles, Bot, Flame } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Stepper } from "@/components/algo/Stepper";
 import { MiniChart } from "@/components/algo/MiniChart";
@@ -29,7 +29,11 @@ function Index() {
       </div>
 
       <div className="mx-auto max-w-3xl px-4 pb-10 sm:px-6">
-        {step === 0 && <StepAlgoType selected={algoType} onSelect={(a) => { setAlgoType(a); goto(1); }} />}
+        {step === 0 && (
+          <StepDiscover
+            onPickStrategy={(s) => { setStrategy(s); setLessonsDone([]); goto(2); }}
+          />
+        )}
         {step === 1 && (
           <StepStrategy
             onBack={() => goto(0)}
@@ -67,68 +71,240 @@ function Index() {
   );
 }
 
-/* ---------- Step 0 ---------- */
-function StepAlgoType({ selected, onSelect }: { selected: AlgoType | null; onSelect: (a: AlgoType) => void }) {
-  const options = [
+/* ---------- Step 0: Netflix-style Discover ---------- */
+function StepDiscover({ onPickStrategy }: { onPickStrategy: (s: Strategy) => void }) {
+  const [gptOpen, setGptOpen] = useState(false);
+  const trending = STRATEGIES.filter((s) => s.type === "Trending Market");
+  const nonTrending = STRATEGIES.filter((s) => s.type === "Non-Trending Market");
+
+  if (gptOpen) {
+    return <PocketfulGPT onBack={() => setGptOpen(false)} onPickStrategy={onPickStrategy} />;
+  }
+
+  return (
+    <div className="space-y-7">
+      <Header title="What's the market doing today?" subtitle="Browse strategies built for each market mood" />
+
+      {/* Pocketful GPT card */}
+      <button
+        onClick={() => setGptOpen(true)}
+        className="group flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-5 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)]"
+      >
+        <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+          <Bot className="h-7 w-7" />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <div className="font-display text-lg font-bold">Pocketful GPT</div>
+            <span className="rounded-full bg-primary-soft px-2 py-0.5 text-[10px] font-bold text-primary">AI</span>
+          </div>
+          <p className="mt-0.5 text-sm text-muted-foreground">Answer 3 quick questions and we'll find the best algo for you.</p>
+        </div>
+        <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+      </button>
+
+      <AlgoRow
+        title="Trending Market"
+        subtitle="Strategies built for clear up/down moves"
+        icon={TrendingUp}
+        accent="🔥"
+        items={trending}
+        onPick={onPickStrategy}
+      />
+
+      <AlgoRow
+        title="Non-Trending Market"
+        subtitle="Range & sideways setups for low volatility"
+        icon={Activity}
+        items={nonTrending}
+        onPick={onPickStrategy}
+      />
+    </div>
+  );
+}
+
+function AlgoRow({
+  title,
+  subtitle,
+  icon: Icon,
+  accent,
+  items,
+  onPick,
+}: {
+  title: string;
+  subtitle: string;
+  icon: any;
+  accent?: string;
+  items: Strategy[];
+  onPick: (s: Strategy) => void;
+}) {
+  return (
+    <section>
+      <div className="mb-3 flex items-end justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <Icon className="h-4 w-4 text-primary" />
+            <h2 className="font-display text-lg font-bold">
+              {title} {accent && <span className="ml-1">{accent}</span>}
+            </h2>
+          </div>
+          <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
+        </div>
+        <button className="text-xs font-semibold text-primary">See all</button>
+      </div>
+      <div className="-mx-4 sm:-mx-6 overflow-x-auto pb-2">
+        <div className="flex gap-3 px-4 sm:px-6 snap-x snap-mandatory">
+          {items.map((s) => (
+            <AlgoTile key={s.id} strategy={s} onPick={onPick} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strategy) => void }) {
+  const locked = !!strategy.locked;
+  return (
+    <button
+      onClick={() => { if (!locked) onPick(strategy); else alert(`Unlock ${strategy.name} for ₹${strategy.price}`); }}
+      className="group relative flex w-[68%] sm:w-[260px] flex-shrink-0 snap-start flex-col rounded-2xl border border-border bg-card p-4 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)]"
+    >
+      {locked && (
+        <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full bg-foreground/90 px-2 py-0.5 text-[10px] font-semibold text-background">
+          <Lock className="h-3 w-3" /> PRO
+        </div>
+      )}
+      <div className={locked ? "opacity-70" : ""}>
+        <div className="flex items-start gap-2">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-soft text-xl">{strategy.icon}</div>
+          <div className="flex-1 min-w-0">
+            <div className="truncate font-display text-sm font-bold">{strategy.name}</div>
+            <div className="text-[11px] text-muted-foreground">{strategy.level}</div>
+          </div>
+        </div>
+        <div className="mt-3 flex items-end justify-between">
+          <div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Win Rate</div>
+            <div className="font-display text-xl font-bold text-primary">+{strategy.winRate}%</div>
+          </div>
+          <Bookmark className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <div className="mt-2 h-12">
+          <MiniChart trend="up" />
+        </div>
+        <div className="mt-2 inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+          {strategy.type === "Trending Market" ? "Trending" : "Range"}
+        </div>
+      </div>
+    </button>
+  );
+}
+
+/* ---------- Pocketful GPT mini-flow ---------- */
+function PocketfulGPT({ onBack, onPickStrategy }: { onBack: () => void; onPickStrategy: (s: Strategy) => void }) {
+  const [qIdx, setQIdx] = useState(0);
+  const [answers, setAnswers] = useState<string[]>([]);
+
+  const questions = [
     {
-      id: "option-buying" as AlgoType,
-      title: "Trending Market",
-      desc: "Pick this when the market has a clear up or down direction.",
-      example: "Example: Nifty rallying 2% on strong news",
-      icon: TrendingUp,
-      tone: "up" as const,
+      q: "What is your total capital for trading?",
+      help: "This helps us suggest suitable strategies.",
+      options: ["Less than ₹1 Lakh", "₹1 – ₹5 Lakhs", "₹5 – ₹20 Lakhs", "More than ₹20 Lakhs"],
     },
     {
-      id: "option-selling-only" as AlgoType,
-      title: "Non-Trending Market",
-      desc: "Pick this when the market is moving sideways in a range.",
-      example: "Example: Nifty stuck between 22,000 – 22,300",
-      icon: Activity,
-      tone: "flat" as const,
+      q: "What is your risk appetite?",
+      help: "We'll recommend strategies matching your risk profile.",
+      options: ["Low (Conservative)", "Moderate", "High (Aggressive)"],
+    },
+    {
+      q: "What's your trading goal?",
+      help: "Different goals suit different setups.",
+      options: ["Steady monthly income", "Capital growth", "Learn & experiment"],
     },
   ];
+
+  if (qIdx >= questions.length) {
+    return <PocketfulRecommendations answers={answers} onBack={onBack} onPickStrategy={onPickStrategy} />;
+  }
+
+  const cur = questions[qIdx];
+  const select = (opt: string) => {
+    const next = [...answers]; next[qIdx] = opt; setAnswers(next);
+    setQIdx(qIdx + 1);
+  };
+
   return (
-    <div className="space-y-6">
-      <Header title="What's the market doing today?" subtitle="Pick one to see strategies that fit" />
-      <div className="grid gap-4">
-        {options.map((o) => {
-          const active = selected === o.id;
-          return (
-            <button
-              key={o.id}
-              onClick={() => onSelect(o.id)}
-              className={`group relative overflow-hidden rounded-3xl border bg-card p-6 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)] ${
-                active ? "border-primary ring-4 ring-primary-soft" : "border-border"
-              }`}
-            >
-              <div className="flex items-start gap-4">
-                <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary">
-                  <o.icon className="h-7 w-7" />
-                </div>
-                <div className="flex-1">
-                  <div className="font-display text-xl font-bold">{o.title}</div>
-                  <p className="mt-1 text-sm text-muted-foreground">{o.desc}</p>
-                  <p className="mt-2 text-xs italic text-muted-foreground">{o.example}</p>
-                </div>
-                <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-              </div>
-            </button>
-          );
-        })}
+    <div className="space-y-5">
+      <Header title="Pocketful GPT" subtitle={`Step ${qIdx + 1} of ${questions.length}`} onBack={qIdx === 0 ? onBack : () => setQIdx(qIdx - 1)} icon={Bot} />
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+        <div className="h-full bg-primary transition-all" style={{ width: `${((qIdx) / questions.length) * 100}%` }} />
       </div>
-      <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
-        <ShieldCheck className="h-5 w-5 text-primary" />
-        <div className="flex-1 text-sm">
-          <div className="font-medium">Not sure which to choose?</div>
-          <div className="text-muted-foreground">Tap to learn how to spot each market</div>
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+        <h2 className="font-display text-xl font-bold">{cur.q}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{cur.help}</p>
+        <div className="mt-4 space-y-2.5">
+          {cur.options.map((opt) => {
+            const sel = answers[qIdx] === opt;
+            return (
+              <button
+                key={opt}
+                onClick={() => select(opt)}
+                className={`flex w-full items-center justify-between gap-3 rounded-xl border p-3.5 text-left transition-all ${
+                  sel ? "border-primary bg-primary-soft" : "border-border bg-background hover:border-primary/50"
+                }`}
+              >
+                <span className="text-sm font-medium">{opt}</span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
+            );
+          })}
         </div>
-        <button className="text-sm font-semibold text-primary">Learn more</button>
       </div>
     </div>
   );
 }
 
-/* ---------- Step 1 ---------- */
+function PocketfulRecommendations({ answers, onBack, onPickStrategy }: { answers: string[]; onBack: () => void; onPickStrategy: (s: Strategy) => void }) {
+  const risk = answers[1] ?? "";
+  // very simple matching: high risk → trending, low/moderate → non-trending bias
+  const recs = risk.startsWith("High")
+    ? STRATEGIES.filter((s) => s.type === "Trending Market")
+    : risk.startsWith("Low")
+    ? STRATEGIES.filter((s) => s.type === "Non-Trending Market")
+    : [...STRATEGIES.filter((s) => s.type === "Non-Trending Market").slice(0, 2), ...STRATEGIES.filter((s) => s.type === "Trending Market").slice(0, 1)];
+
+  return (
+    <div className="space-y-5">
+      <Header title="Recommended for you" subtitle="Based on your answers, these strategies fit best" onBack={onBack} icon={Sparkles} />
+      <div className="grid gap-3">
+        {recs.map((s) => {
+          const locked = !!s.locked;
+          return (
+            <button
+              key={s.id}
+              onClick={() => { if (!locked) onPickStrategy(s); else alert(`Unlock ${s.name} for ₹${s.price}`); }}
+              className="group flex items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)]"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-soft text-2xl">{s.icon}</div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <div className="font-display text-base font-bold">{s.name}</div>
+                  {locked && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
+                </div>
+                <div className="mt-0.5 text-xs text-muted-foreground">{s.type} · {s.level}</div>
+                <div className="mt-1 text-xs font-semibold text-primary">+{s.winRate}% win rate</div>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Step 1 (kept for fallback) ---------- */
 function StepStrategy({ onBack, onSelect }: { onBack: () => void; onSelect: (s: Strategy) => void }) {
   const [tab, setTab] = useState<"buying" | "selling">("buying");
   return (
