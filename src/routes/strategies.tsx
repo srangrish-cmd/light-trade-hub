@@ -72,10 +72,28 @@ function Index() {
 }
 
 /* ---------- Step 0: Netflix-style Discover ---------- */
+const PROOF_POINTS = [
+  { label: "Avg. Returns", value: "+38%", sub: "last 12 months" },
+  { label: "Active Traders", value: "12,400+", sub: "deploying live" },
+  { label: "Capital Deployed", value: "₹284 Cr", sub: "across strategies" },
+];
+
+const CATEGORIES = [
+  { id: "buying", label: "Options Buying", icon: "🚀", filter: (s: Strategy) => s.type === "Trending Market" && s.level !== "Advanced" },
+  { id: "selling", label: "Options Selling", icon: "💰", filter: (s: Strategy) => s.type === "Non-Trending Market" },
+  { id: "intraday", label: "Intraday", icon: "⚡", filter: (s: Strategy) => s.suitable === "Intraday" },
+];
+
 function StepDiscover({ onPickStrategy }: { onPickStrategy: (s: Strategy) => void }) {
   const [gptOpen, setGptOpen] = useState(false);
+  const [activeCat, setActiveCat] = useState<string | null>(null);
   const trending = STRATEGIES.filter((s) => s.type === "Trending Market");
   const nonTrending = STRATEGIES.filter((s) => s.type === "Non-Trending Market");
+
+  // Recommended = unlocked, highest win-rate first
+  const recommended = [...STRATEGIES].sort((a, b) => Number(!!a.locked) - Number(!!b.locked) || b.winRate - a.winRate).slice(0, 4);
+
+  const filtered = activeCat ? STRATEGIES.filter(CATEGORIES.find((c) => c.id === activeCat)!.filter) : null;
 
   if (gptOpen) {
     return <PocketfulGPT onBack={() => setGptOpen(false)} onPickStrategy={onPickStrategy} />;
@@ -83,42 +101,104 @@ function StepDiscover({ onPickStrategy }: { onPickStrategy: (s: Strategy) => voi
 
   return (
     <div className="space-y-7">
-      <Header title="What's the market doing today?" subtitle="Browse strategies built for each market mood" />
+      {/* Outcome headline */}
+      <div>
+        <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+          Deploy proven strategies. <span className="text-primary">Track real PnL.</span>
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">Hand-picked algos with verified backtests — go from learn to live in minutes.</p>
+      </div>
+
+      {/* Proof points */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        {PROOF_POINTS.map((p) => (
+          <div key={p.label} className="rounded-2xl border border-border bg-card p-3 sm:p-4">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{p.label}</div>
+            <div className="mt-1 font-display text-xl font-bold sm:text-2xl text-primary">{p.value}</div>
+            <div className="mt-0.5 text-[10px] text-muted-foreground">{p.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Category shortcuts */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setActiveCat(null)}
+          className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+            activeCat === null ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/50"
+          }`}
+        >
+          All
+        </button>
+        {CATEGORIES.map((c) => (
+          <button
+            key={c.id}
+            onClick={() => setActiveCat(activeCat === c.id ? null : c.id)}
+            className={`flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+              activeCat === c.id ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/50"
+            }`}
+          >
+            <span>{c.icon}</span> {c.label}
+          </button>
+        ))}
+      </div>
 
       {/* Pocketful GPT card */}
       <button
         onClick={() => setGptOpen(true)}
-        className="group flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-5 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)]"
+        className="group flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)]"
       >
-        <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary">
-          <Bot className="h-7 w-7" />
+        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+          <Bot className="h-6 w-6" />
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <div className="font-display text-lg font-bold">Pocketful GPT</div>
+            <div className="font-display text-base font-bold">Pocketful GPT</div>
             <span className="rounded-full bg-primary-soft px-2 py-0.5 text-[10px] font-bold text-primary">AI</span>
           </div>
-          <p className="mt-0.5 text-sm text-muted-foreground">Answer 3 quick questions and we'll find the best algo for you.</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">3 quick questions → best algo for you</p>
         </div>
         <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
       </button>
 
-      <AlgoRow
-        title="Trending Market"
-        subtitle="Strategies built for clear up/down moves"
-        icon={TrendingUp}
-        accent="🔥"
-        items={trending}
-        onPick={onPickStrategy}
-      />
+      {filtered ? (
+        <AlgoRow
+          title={CATEGORIES.find((c) => c.id === activeCat)!.label}
+          subtitle="Filtered by category"
+          icon={Sparkles}
+          items={filtered}
+          onPick={onPickStrategy}
+        />
+      ) : (
+        <>
+          {/* Recommended for you — above the fold */}
+          <AlgoRow
+            title="Recommended for you"
+            subtitle="Top performers based on your profile"
+            icon={Sparkles}
+            accent="✨"
+            items={recommended}
+            onPick={onPickStrategy}
+          />
 
-      <AlgoRow
-        title="Non-Trending Market"
-        subtitle="Range & sideways setups for low volatility"
-        icon={Activity}
-        items={nonTrending}
-        onPick={onPickStrategy}
-      />
+          <AlgoRow
+            title="Trending Market"
+            subtitle="Strategies built for clear up/down moves"
+            icon={TrendingUp}
+            accent="🔥"
+            items={trending}
+            onPick={onPickStrategy}
+          />
+
+          <AlgoRow
+            title="Non-Trending Market"
+            subtitle="Range & sideways setups for low volatility"
+            icon={Activity}
+            items={nonTrending}
+            onPick={onPickStrategy}
+          />
+        </>
+      )}
     </div>
   );
 }
