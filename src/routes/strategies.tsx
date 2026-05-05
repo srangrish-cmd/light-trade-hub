@@ -269,36 +269,59 @@ function AlgoRow({
 
 function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strategy) => void }) {
   const locked = !!strategy.locked;
+  const { returnPct, drawdown, risk, tag } = getStrategyMeta(strategy);
+  const TagIcon = TAG_STYLES[tag].icon;
   return (
     <button
       onClick={() => { if (!locked) onPick(strategy); else alert(`Unlock ${strategy.name} for ₹${strategy.price}`); }}
-      className="group relative flex w-[68%] sm:w-[260px] flex-shrink-0 snap-start flex-col rounded-2xl border border-border bg-card p-4 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)]"
+      className="group relative flex w-[78%] sm:w-[280px] flex-shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-border bg-card text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-[var(--shadow-card)] active:scale-[0.98]"
     >
-      {locked && (
-        <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full bg-foreground/90 px-2 py-0.5 text-[10px] font-semibold text-background">
-          <Lock className="h-3 w-3" /> PRO
-        </div>
-      )}
-      <div className={locked ? "opacity-70" : ""}>
+      {/* Top: tag + lock */}
+      <div className="flex items-center justify-between px-4 pt-3">
+        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${TAG_STYLES[tag].cls}`}>
+          <TagIcon className="h-3 w-3" /> {tag}
+        </span>
+        {locked ? (
+          <span className="inline-flex items-center gap-1 rounded-full bg-foreground/90 px-2 py-0.5 text-[10px] font-semibold text-background">
+            <Lock className="h-3 w-3" /> PRO
+          </span>
+        ) : (
+          <ShieldCheck className="h-3.5 w-3.5 text-primary" aria-label="Verified" />
+        )}
+      </div>
+
+      <div className={`flex-1 px-4 pt-2 pb-4 ${locked ? "opacity-80" : ""}`}>
+        {/* Name + icon */}
         <div className="flex items-start gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-soft text-xl">{strategy.icon}</div>
-          <div className="flex-1 min-w-0">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-lg">{strategy.icon}</div>
+          <div className="min-w-0 flex-1">
             <div className="truncate font-display text-sm font-bold">{strategy.name}</div>
-            <div className="text-[11px] text-muted-foreground">{strategy.level}</div>
+            <div className="text-[10px] text-muted-foreground">{strategy.level} · {strategy.suitable}</div>
           </div>
         </div>
-        <div className="mt-3 flex items-end justify-between">
-          <div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Win Rate</div>
-            <div className="font-display text-xl font-bold text-primary">+{strategy.winRate}%</div>
-          </div>
-          <Bookmark className="h-4 w-4 text-muted-foreground" />
+
+        {/* Big return — primary visual */}
+        <div className="mt-3">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Returns (1Y)</div>
+          <div className="font-display text-3xl font-extrabold leading-none text-primary">+{returnPct}%</div>
         </div>
+
+        {/* Equity curve */}
         <div className="mt-2 h-12">
           <MiniChart trend="up" />
         </div>
-        <div className="mt-2 inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-          {strategy.type === "Trending Market" ? "Trending" : "Range"}
+
+        {/* Quick stats */}
+        <div className="mt-2 flex items-center justify-between text-[11px]">
+          <div>
+            <div className="text-muted-foreground">Win</div>
+            <div className="font-semibold">{strategy.winRate}%</div>
+          </div>
+          <div>
+            <div className="text-muted-foreground">Drawdown</div>
+            <div className="font-semibold text-rose-500">-{drawdown}%</div>
+          </div>
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${RISK_STYLES[risk]}`}>{risk}</span>
         </div>
       </div>
     </button>
