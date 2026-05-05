@@ -450,47 +450,71 @@ function StepStrategy({ onBack, onSelect }: { onBack: () => void; onSelect: (s: 
           </button>
         ))}
       </div>
-      <div className="grid gap-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         {STRATEGIES.map((s) => {
           const locked = !!s.locked;
+          const { returnPct, drawdown, risk, tag } = getStrategyMeta(s);
+          const TagIcon = TAG_STYLES[tag].icon;
           return (
             <button
               key={s.id}
               onClick={() => { if (!locked) onSelect(s); }}
-              className={`group relative rounded-2xl border border-border bg-card p-5 text-left transition-all ${
-                locked ? "cursor-not-allowed" : "hover:border-primary hover:shadow-[var(--shadow-card)]"
+              className={`group relative overflow-hidden rounded-2xl border border-border bg-card p-5 text-left transition-all duration-200 ${
+                locked ? "cursor-not-allowed" : "hover:-translate-y-0.5 hover:border-primary hover:shadow-[var(--shadow-card)] active:scale-[0.99]"
               }`}
             >
-              {locked && (
-                <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-foreground/90 px-2.5 py-1 text-[10px] font-semibold text-background">
-                  <Lock className="h-3 w-3" /> PRO
-                </div>
-              )}
-              <div className={locked ? "opacity-60" : ""}>
+              <div className="flex items-center justify-between">
+                <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${TAG_STYLES[tag].cls}`}>
+                  <TagIcon className="h-3 w-3" /> {tag}
+                </span>
+                {locked ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-foreground/90 px-2 py-0.5 text-[10px] font-semibold text-background">
+                    <Lock className="h-3 w-3" /> PRO
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary">
+                    <ShieldCheck className="h-3.5 w-3.5" /> Verified
+                  </span>
+                )}
+              </div>
+
+              <div className={`mt-3 ${locked ? "opacity-70" : ""}`}>
                 <div className="flex items-start gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft text-xl">{s.icon}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="font-display text-lg font-bold">{s.name}</div>
-                      {!locked && <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />}
-                    </div>
-                    <div className="mt-1 flex flex-wrap gap-1.5">
-                      <Badge>{s.level}</Badge>
-                      <Badge tone="primary">{s.probability}</Badge>
-                    </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-display text-lg font-bold">{s.name}</div>
+                    <div className="text-xs text-muted-foreground">{s.level} · {s.suitable}</div>
                   </div>
                 </div>
-                <p className="mt-3 text-sm text-muted-foreground">{s.tagline}</p>
-                <div className="mt-3 flex items-end justify-between gap-4">
+
+                {/* Big return as primary visual */}
+                <div className="mt-4 flex items-end justify-between gap-3">
                   <div>
-                    <div className="text-xs text-muted-foreground">Win Rate</div>
-                    <div className="text-2xl font-display font-bold text-primary">{s.winRate}%</div>
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Returns (1Y)</div>
+                    <div className="font-display text-4xl font-extrabold leading-none text-primary">+{returnPct}%</div>
                   </div>
-                  <div className="w-32">
+                  <div className="h-14 w-32">
                     <MiniChart trend="up" />
                   </div>
                 </div>
+
+                {/* Stats row */}
+                <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-surface p-2.5 text-center">
+                  <div>
+                    <div className="text-[10px] text-muted-foreground">Win</div>
+                    <div className="text-sm font-bold">{s.winRate}%</div>
+                  </div>
+                  <div className="border-x border-border">
+                    <div className="text-[10px] text-muted-foreground">Drawdown</div>
+                    <div className="text-sm font-bold text-rose-500">-{drawdown}%</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-muted-foreground">Risk</div>
+                    <div className={`mx-auto mt-0.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold ${RISK_STYLES[risk]}`}>{risk}</div>
+                  </div>
+                </div>
               </div>
+
               {locked && (
                 <div
                   role="button"
