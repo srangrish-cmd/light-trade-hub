@@ -29,7 +29,11 @@ function Index() {
       </div>
 
       <div className="mx-auto max-w-3xl px-4 pb-10 sm:px-6">
-        {step === 0 && <StepAlgoType selected={algoType} onSelect={(a) => { setAlgoType(a); goto(1); }} />}
+        {step === 0 && (
+          <StepDiscover
+            onPickStrategy={(s) => { setStrategy(s); setLessonsDone([]); goto(2); }}
+          />
+        )}
         {step === 1 && (
           <StepStrategy
             onBack={() => goto(0)}
