@@ -303,6 +303,9 @@ function PocketfulRecommendations({ answers, onBack, onPickStrategy }: { answers
     </div>
   );
 }
+
+/* ---------- Step 1 (kept for fallback) ---------- */
+function StepStrategy({ onBack, onSelect }: { onBack: () => void; onSelect: (s: Strategy) => void }) {
   const [tab, setTab] = useState<"buying" | "selling">("buying");
   return (
     <div className="space-y-5">
