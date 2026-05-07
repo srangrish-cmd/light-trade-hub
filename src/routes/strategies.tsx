@@ -9,6 +9,7 @@ import { STRATEGIES, type AlgoType, type Strategy } from "@/components/algo/type
 /* ---------- Strategy meta helpers ---------- */
 function getStrategyMeta(s: Strategy) {
   const returnPct = s.winRate + Math.round((s.capital % 13) + 8);
+  const backtestPct = Math.max(20, returnPct - 6); // backtest slightly lower than live
   const drawdown = Math.max(6, Math.round((100 - s.winRate) * 0.6));
   const risk: "Low" | "Medium" | "High" =
     s.level === "Beginner" ? "Low" : s.level === "Intermediate" ? "Medium" : "High";
@@ -16,7 +17,15 @@ function getStrategyMeta(s: Strategy) {
     s.id === "iron-condor" || s.id === "range-hunter" ? "Safe"
     : s.id === "mean-revert" ? "New"
     : "Trending";
-  return { returnPct, drawdown, risk, tag };
+  // deterministic users count based on win rate & id length
+  const users = 800 + (s.winRate * 47) + (s.id.length * 113);
+  const tested = s.level === "Advanced" ? "5Y" : s.level === "Intermediate" ? "3Y" : "2Y";
+  return { returnPct, backtestPct, drawdown, risk, tag, users, tested };
+}
+
+function fmtUsers(n: number) {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return String(n);
 }
 
 const RISK_STYLES: Record<string, string> = {
