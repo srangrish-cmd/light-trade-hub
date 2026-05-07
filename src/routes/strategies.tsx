@@ -537,20 +537,26 @@ function StepStrategy({ onBack, onSelect }: { onBack: () => void; onSelect: (s: 
                   </div>
                 </div>
 
-                {/* Stats row */}
+                {/* Stats row — drawdown highlighted */}
                 <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-surface p-2.5 text-center">
                   <div>
-                    <div className="text-[10px] text-muted-foreground">Win</div>
+                    <div className="text-[10px] text-muted-foreground">Win Rate</div>
                     <div className="text-sm font-bold">{s.winRate}%</div>
                   </div>
                   <div className="border-x border-border">
-                    <div className="text-[10px] text-muted-foreground">Drawdown</div>
-                    <div className="text-sm font-bold text-rose-500">-{drawdown}%</div>
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-rose-500/80">Max Drawdown</div>
+                    <div className="text-base font-extrabold text-rose-500">-{drawdown}%</div>
                   </div>
                   <div>
                     <div className="text-[10px] text-muted-foreground">Risk</div>
                     <div className={`mx-auto mt-0.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold ${RISK_STYLES[risk]}`}>{risk}</div>
                   </div>
+                </div>
+
+                {/* Users count */}
+                <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <User className="h-3.5 w-3.5" />
+                  <span><span className="font-semibold text-foreground">{fmtUsers(users)}</span> traders deployed this</span>
                 </div>
               </div>
 
