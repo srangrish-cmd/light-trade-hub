@@ -492,7 +492,7 @@ function StepStrategy({ onBack, onSelect }: { onBack: () => void; onSelect: (s: 
       <div className="grid gap-4 sm:grid-cols-2">
         {STRATEGIES.map((s) => {
           const locked = !!s.locked;
-          const { returnPct, drawdown, risk, tag } = getStrategyMeta(s);
+          const { returnPct, drawdown, risk, tag, users, tested } = getStrategyMeta(s);
           const TagIcon = TAG_STYLES[tag].icon;
           return (
             <button
@@ -512,7 +512,7 @@ function StepStrategy({ onBack, onSelect }: { onBack: () => void; onSelect: (s: 
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary">
-                    <ShieldCheck className="h-3.5 w-3.5" /> Verified
+                    <ShieldCheck className="h-3.5 w-3.5" /> Verified · {tested} tested
                   </span>
                 )}
               </div>
