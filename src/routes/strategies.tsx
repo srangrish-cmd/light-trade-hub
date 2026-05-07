@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, Bookmark, Check, ChevronRight, Home, BookOpen, User, BarChart3, Play, Lock, Rocket, TrendingUp, TrendingDown, Activity, ShieldCheck, Sparkles, Bot, Flame, Shield, Sparkle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Bookmark, Check, ChevronRight, Hop as Home, BookOpen, User, ChartBar as BarChart3, Play, Lock, Rocket, TrendingUp, TrendingDown, Activity, ShieldCheck, Sparkles, Bot, Flame, Shield, Sparkle } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Stepper } from "@/components/algo/Stepper";
 import { MiniChart } from "@/components/algo/MiniChart";
@@ -111,22 +111,10 @@ const PROOF_POINTS = [
   { label: "Capital Deployed", value: "₹284 Cr", sub: "across strategies" },
 ];
 
-const CATEGORIES = [
-  { id: "buying", label: "Options Buying", icon: "🚀", filter: (s: Strategy) => s.type === "Trending Market" && s.level !== "Advanced" },
-  { id: "selling", label: "Options Selling", icon: "💰", filter: (s: Strategy) => s.type === "Non-Trending Market" },
-  { id: "intraday", label: "Intraday", icon: "⚡", filter: (s: Strategy) => s.suitable === "Intraday" },
-];
-
 function StepDiscover({ onPickStrategy }: { onPickStrategy: (s: Strategy) => void }) {
   const [gptOpen, setGptOpen] = useState(false);
-  const [activeCat, setActiveCat] = useState<string | null>(null);
   const trending = STRATEGIES.filter((s) => s.type === "Trending Market");
   const nonTrending = STRATEGIES.filter((s) => s.type === "Non-Trending Market");
-
-  // Recommended = unlocked, highest win-rate first
-  const recommended = [...STRATEGIES].sort((a, b) => Number(!!a.locked) - Number(!!b.locked) || b.winRate - a.winRate).slice(0, 4);
-
-  const filtered = activeCat ? STRATEGIES.filter(CATEGORIES.find((c) => c.id === activeCat)!.filter) : null;
 
   if (gptOpen) {
     return <PocketfulGPT onBack={() => setGptOpen(false)} onPickStrategy={onPickStrategy} />;
@@ -134,6 +122,12 @@ function StepDiscover({ onPickStrategy }: { onPickStrategy: (s: Strategy) => voi
 
   return (
     <div className="space-y-7">
+      {/* Pocketful header with logo */}
+      <div className="flex items-center gap-2">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-400 text-lg font-bold">*</div>
+        <span className="text-2xl font-display font-bold text-foreground">Pocketful</span>
+      </div>
+
       {/* Outcome headline */}
       <div>
         <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
@@ -153,85 +147,38 @@ function StepDiscover({ onPickStrategy }: { onPickStrategy: (s: Strategy) => voi
         ))}
       </div>
 
-      {/* Category shortcuts */}
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setActiveCat(null)}
-          className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${
-            activeCat === null ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/50"
-          }`}
-        >
-          All
-        </button>
-        {CATEGORIES.map((c) => (
-          <button
-            key={c.id}
-            onClick={() => setActiveCat(activeCat === c.id ? null : c.id)}
-            className={`flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${
-              activeCat === c.id ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/50"
-            }`}
-          >
-            <span>{c.icon}</span> {c.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Pocketful GPT card */}
+      {/* AI Insights card - styled like image */}
       <button
         onClick={() => setGptOpen(true)}
-        className="group flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)]"
+        className="group flex w-full items-center gap-4 rounded-3xl border border-border bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20 p-5 text-left transition-all hover:shadow-[var(--shadow-card)]"
       >
-        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary">
-          <Bot className="h-6 w-6" />
+        <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-white">
+          <Bot className="h-8 w-8" />
         </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <div className="font-display text-base font-bold">Pocketful GPT</div>
-            <span className="rounded-full bg-primary-soft px-2 py-0.5 text-[10px] font-bold text-primary">AI</span>
-          </div>
-          <p className="mt-0.5 text-xs text-muted-foreground">3 quick questions → best algo for you</p>
+          <div className="font-display text-xl font-bold text-foreground">AI Insights</div>
+          <p className="mt-0.5 text-sm text-muted-foreground">Analyse this stock with pocketful AI</p>
         </div>
-        <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+        <ChevronRight className="h-6 w-6 text-muted-foreground transition-transform group-hover:translate-x-1" />
       </button>
 
-      {filtered ? (
-        <AlgoRow
-          title={CATEGORIES.find((c) => c.id === activeCat)!.label}
-          subtitle="Filtered by category"
-          icon={Sparkles}
-          items={filtered}
-          onPick={onPickStrategy}
-        />
-      ) : (
-        <>
-          {/* Recommended for you — above the fold */}
-          <AlgoRow
-            title="Recommended for you"
-            subtitle="Top performers based on your profile"
-            icon={Sparkles}
-            accent="✨"
-            items={recommended}
-            onPick={onPickStrategy}
-          />
+      {/* Strategy sections */}
+      <AlgoRow
+        title="Trending Market"
+        subtitle="Strategies built for clear up/down moves"
+        icon={TrendingUp}
+        accent="🔥"
+        items={trending}
+        onPick={onPickStrategy}
+      />
 
-          <AlgoRow
-            title="Trending Market"
-            subtitle="Strategies built for clear up/down moves"
-            icon={TrendingUp}
-            accent="🔥"
-            items={trending}
-            onPick={onPickStrategy}
-          />
-
-          <AlgoRow
-            title="Non-Trending Market"
-            subtitle="Range & sideways setups for low volatility"
-            icon={Activity}
-            items={nonTrending}
-            onPick={onPickStrategy}
-          />
-        </>
-      )}
+      <AlgoRow
+        title="Non-Trending Market"
+        subtitle="Range & sideways setups for low volatility"
+        icon={Activity}
+        items={nonTrending}
+        onPick={onPickStrategy}
+      />
     </div>
   );
 }
@@ -442,7 +389,7 @@ function PocketfulRecommendations({ answers, onBack, onPickStrategy }: { answers
 
   return (
     <div className="space-y-5">
-      <Header title="Recommended for you" subtitle="Based on your answers, these strategies fit best" onBack={onBack} icon={Sparkles} />
+      <Header title="Perfect match" subtitle="Here are your best strategies" onBack={onBack} icon={Sparkles} />
       <div className="grid gap-3">
         {recs.map((s) => {
           const locked = !!s.locked;
