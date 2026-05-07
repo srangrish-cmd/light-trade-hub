@@ -16,7 +16,7 @@ import {
 import { STRATEGIES, type StrategyId } from "@/components/algo/types";
 
 const searchSchema = z.object({
-  id: z.enum(["momentum-breakout", "pullback-pro", "trend-continuation"]).optional(),
+  id: z.enum(["momentum-breakout", "pullback-pro", "trend-continuation", "iron-condor", "range-hunter", "mean-revert"]).optional(),
 });
 
 export const Route = createFileRoute("/backtest")({
