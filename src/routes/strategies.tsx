@@ -105,11 +105,7 @@ function Index() {
 }
 
 /* ---------- Step 0: Netflix-style Discover ---------- */
-const PROOF_POINTS = [
-  { label: "Avg. Returns", value: "+38%", sub: "last 12 months" },
-  { label: "Active Traders", value: "12,400+", sub: "deploying live" },
-  { label: "Capital Deployed", value: "₹284 Cr", sub: "across strategies" },
-];
+const PROOF_POINTS: any[] = [];
 
 function StepDiscover({ onPickStrategy }: { onPickStrategy: (s: Strategy) => void }) {
   const [gptOpen, setGptOpen] = useState(false);
@@ -122,10 +118,10 @@ function StepDiscover({ onPickStrategy }: { onPickStrategy: (s: Strategy) => voi
 
   return (
     <div className="space-y-7">
-      {/* Pocketful header with logo */}
-      <div className="flex items-center gap-2">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-400 text-lg font-bold">*</div>
-        <span className="text-2xl font-display font-bold text-foreground">Pocketful</span>
+      {/* Pocketful header */}
+      <div className="flex items-center gap-2.5">
+        <span className="text-2xl">*</span>
+        <span className="text-xl font-display font-bold text-foreground">Pocketful</span>
       </div>
 
       {/* Outcome headline */}
@@ -136,31 +132,43 @@ function StepDiscover({ onPickStrategy }: { onPickStrategy: (s: Strategy) => voi
         <p className="mt-2 text-sm text-muted-foreground">Hand-picked algos with verified backtests — go from learn to live in minutes.</p>
       </div>
 
-      {/* Proof points */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3">
-        {PROOF_POINTS.map((p) => (
-          <div key={p.label} className="rounded-2xl border border-border bg-card p-3 sm:p-4">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{p.label}</div>
-            <div className="mt-1 font-display text-xl font-bold sm:text-2xl text-primary">{p.value}</div>
-            <div className="mt-0.5 text-[10px] text-muted-foreground">{p.sub}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* AI Insights card - styled like image */}
+      {/* Pocketful GPT card */}
       <button
         onClick={() => setGptOpen(true)}
-        className="group flex w-full items-center gap-4 rounded-3xl border border-border bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20 p-5 text-left transition-all hover:shadow-[var(--shadow-card)]"
+        className="group flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-left transition-all hover:border-primary hover:shadow-[var(--shadow-card)]"
       >
-        <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-white">
-          <Bot className="h-8 w-8" />
+        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-purple-600 text-white">
+          <Bot className="h-6 w-6" />
         </div>
         <div className="flex-1">
-          <div className="font-display text-xl font-bold text-foreground">AI Insights</div>
-          <p className="mt-0.5 text-sm text-muted-foreground">Analyse this stock with pocketful AI</p>
+          <div className="flex items-center gap-2">
+            <div className="font-display text-base font-bold">Pocketful GPT</div>
+            <span className="rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-bold text-purple-600">AI</span>
+          </div>
+          <p className="mt-0.5 text-xs text-muted-foreground">3 quick questions → best algo for you</p>
         </div>
-        <ChevronRight className="h-6 w-6 text-muted-foreground transition-transform group-hover:translate-x-1" />
+        <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
       </button>
+
+      {/* Introducing Algos */}
+      <div className="rounded-2xl border border-border bg-card p-6 flex items-start justify-between">
+        <div>
+          <h2 className="font-display text-2xl font-bold">Introducing Algos</h2>
+          <p className="mt-2 text-sm text-muted-foreground max-w-xs">Learn, test and deploy automated trading strategies — built for everyone.</p>
+          <button className="mt-4 rounded-lg bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-foreground/90 transition-colors">Explore Algos</button>
+        </div>
+        <svg className="h-32 w-32 flex-shrink-0" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g>
+            <rect x="30" y="50" width="25" height="25" fill="#10b981" stroke="#059669" strokeWidth="1"/>
+            <rect x="30" y="50" width="25" height="25" fill="#6ee7b7" stroke="#10b981" strokeWidth="1" opacity="0.6"/>
+            <rect x="55" y="50" width="25" height="25" fill="#6ee7b7" stroke="#059669" strokeWidth="1"/>
+            <rect x="30" y="25" width="25" height="25" fill="#6ee7b7" stroke="#059669" strokeWidth="1"/>
+            <rect x="55" y="25" width="25" height="25" fill="#ffffff" stroke="#d1d5db" strokeWidth="1"/>
+            <circle cx="42.5" cy="37.5" r="8" fill="#ffffff" stroke="#059669" strokeWidth="1.5"/>
+            <circle cx="47.5" cy="42.5" r="3" fill="#059669"/>
+          </g>
+        </svg>
+      </div>
 
       {/* Strategy sections */}
       <AlgoRow
