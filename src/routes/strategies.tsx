@@ -278,8 +278,10 @@ function AlgoRow({
 
 function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strategy) => void }) {
   const locked = !!strategy.locked;
-  const { returnPct, drawdown, risk, tag } = getStrategyMeta(strategy);
+  const { returnPct, backtestPct, drawdown, risk, tag, users, tested } = getStrategyMeta(strategy);
   const TagIcon = TAG_STYLES[tag].icon;
+  const [mode, setMode] = useState<"live" | "backtest">("live");
+  const display = mode === "live" ? returnPct : backtestPct;
   return (
     <button
       onClick={() => { if (!locked) onPick(strategy); else alert(`Unlock ${strategy.name} for ₹${strategy.price}`); }}
@@ -295,7 +297,9 @@ function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strate
             <Lock className="h-3 w-3" /> PRO
           </span>
         ) : (
-          <ShieldCheck className="h-3.5 w-3.5 text-primary" aria-label="Verified" />
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary">
+            <ShieldCheck className="h-3 w-3" /> Verified · {tested} tested
+          </span>
         )}
       </div>
 
@@ -309,10 +313,30 @@ function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strate
           </div>
         </div>
 
+        {/* Live / Backtest toggle */}
+        <div
+          role="tablist"
+          onClick={(e) => e.stopPropagation()}
+          className="mt-3 inline-flex rounded-full bg-muted p-0.5 text-[10px] font-semibold"
+        >
+          {(["live", "backtest"] as const).map((m) => (
+            <span
+              key={m}
+              role="tab"
+              onClick={(e) => { e.stopPropagation(); setMode(m); }}
+              className={`cursor-pointer rounded-full px-2 py-0.5 transition-colors ${
+                mode === m ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+              }`}
+            >
+              {m === "live" ? "Live" : "Backtest"}
+            </span>
+          ))}
+        </div>
+
         {/* Big return — primary visual */}
-        <div className="mt-3">
+        <div className="mt-1.5">
           <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Returns (1Y)</div>
-          <div className="font-display text-3xl font-extrabold leading-none text-primary">+{returnPct}%</div>
+          <div className="font-display text-3xl font-extrabold leading-none text-primary">+{display}%</div>
         </div>
 
         {/* Equity curve */}
@@ -327,10 +351,16 @@ function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strate
             <div className="font-semibold">{strategy.winRate}%</div>
           </div>
           <div>
-            <div className="text-muted-foreground">Drawdown</div>
+            <div className="text-muted-foreground">Max DD</div>
             <div className="font-semibold text-rose-500">-{drawdown}%</div>
           </div>
           <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${RISK_STYLES[risk]}`}>{risk}</span>
+        </div>
+
+        {/* Users count */}
+        <div className="mt-2 flex items-center gap-1 text-[10px] text-muted-foreground">
+          <User className="h-3 w-3" />
+          <span><span className="font-semibold text-foreground">{fmtUsers(users)}</span> traders deployed</span>
         </div>
       </div>
     </button>
