@@ -30,10 +30,10 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Algoo — Learn & Deploy Trading Algorithms" },
+      { title: "Pocketful Algo" },
       { name: "description", content: "A clean, simple way to learn and deploy algorithmic trading strategies. Built for everyone." },
-      { property: "og:title", content: "Algoo — Learn & Deploy Trading Algorithms" },
-      { name: "twitter:title", content: "Algoo — Learn & Deploy Trading Algorithms" },
+      { property: "og:title", content: "Pocketful Algo" },
+      { name: "twitter:title", content: "Pocketful Algo" },
       { property: "og:description", content: "A clean, simple way to learn and deploy algorithmic trading strategies. Built for everyone." },
       { name: "twitter:description", content: "A clean, simple way to learn and deploy algorithmic trading strategies. Built for everyone." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/981d2787-8a4d-4b0f-b02d-b608c2993311/id-preview-c1a4c4e6--8aaf9ca9-0429-407f-8eeb-67bb9b996bc0.lovable.app-1777875282135.png" },
