@@ -9,6 +9,7 @@ import { STRATEGIES, type AlgoType, type Strategy } from "@/components/algo/type
 /* ---------- Strategy meta helpers ---------- */
 function getStrategyMeta(s: Strategy) {
   const returnPct = s.winRate + Math.round((s.capital % 13) + 8);
+  const backtestPct = Math.max(20, returnPct - 6); // backtest slightly lower than live
   const drawdown = Math.max(6, Math.round((100 - s.winRate) * 0.6));
   const risk: "Low" | "Medium" | "High" =
     s.level === "Beginner" ? "Low" : s.level === "Intermediate" ? "Medium" : "High";
@@ -16,7 +17,15 @@ function getStrategyMeta(s: Strategy) {
     s.id === "iron-condor" || s.id === "range-hunter" ? "Safe"
     : s.id === "mean-revert" ? "New"
     : "Trending";
-  return { returnPct, drawdown, risk, tag };
+  // deterministic users count based on win rate & id length
+  const users = 800 + (s.winRate * 47) + (s.id.length * 113);
+  const tested = s.level === "Advanced" ? "5Y" : s.level === "Intermediate" ? "3Y" : "2Y";
+  return { returnPct, backtestPct, drawdown, risk, tag, users, tested };
+}
+
+function fmtUsers(n: number) {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return String(n);
 }
 
 const RISK_STYLES: Record<string, string> = {
@@ -269,8 +278,10 @@ function AlgoRow({
 
 function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strategy) => void }) {
   const locked = !!strategy.locked;
-  const { returnPct, drawdown, risk, tag } = getStrategyMeta(strategy);
+  const { returnPct, backtestPct, drawdown, risk, tag, users, tested } = getStrategyMeta(strategy);
   const TagIcon = TAG_STYLES[tag].icon;
+  const [mode, setMode] = useState<"live" | "backtest">("live");
+  const display = mode === "live" ? returnPct : backtestPct;
   return (
     <button
       onClick={() => { if (!locked) onPick(strategy); else alert(`Unlock ${strategy.name} for ₹${strategy.price}`); }}
@@ -286,7 +297,9 @@ function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strate
             <Lock className="h-3 w-3" /> PRO
           </span>
         ) : (
-          <ShieldCheck className="h-3.5 w-3.5 text-primary" aria-label="Verified" />
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary">
+            <ShieldCheck className="h-3 w-3" /> Verified · {tested} tested
+          </span>
         )}
       </div>
 
@@ -300,10 +313,30 @@ function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strate
           </div>
         </div>
 
+        {/* Live / Backtest toggle */}
+        <div
+          role="tablist"
+          onClick={(e) => e.stopPropagation()}
+          className="mt-3 inline-flex rounded-full bg-muted p-0.5 text-[10px] font-semibold"
+        >
+          {(["live", "backtest"] as const).map((m) => (
+            <span
+              key={m}
+              role="tab"
+              onClick={(e) => { e.stopPropagation(); setMode(m); }}
+              className={`cursor-pointer rounded-full px-2 py-0.5 transition-colors ${
+                mode === m ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+              }`}
+            >
+              {m === "live" ? "Live" : "Backtest"}
+            </span>
+          ))}
+        </div>
+
         {/* Big return — primary visual */}
-        <div className="mt-3">
+        <div className="mt-1.5">
           <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Returns (1Y)</div>
-          <div className="font-display text-3xl font-extrabold leading-none text-primary">+{returnPct}%</div>
+          <div className="font-display text-3xl font-extrabold leading-none text-primary">+{display}%</div>
         </div>
 
         {/* Equity curve */}
@@ -318,10 +351,16 @@ function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strate
             <div className="font-semibold">{strategy.winRate}%</div>
           </div>
           <div>
-            <div className="text-muted-foreground">Drawdown</div>
+            <div className="text-muted-foreground">Max DD</div>
             <div className="font-semibold text-rose-500">-{drawdown}%</div>
           </div>
           <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${RISK_STYLES[risk]}`}>{risk}</span>
+        </div>
+
+        {/* Users count */}
+        <div className="mt-2 flex items-center gap-1 text-[10px] text-muted-foreground">
+          <User className="h-3 w-3" />
+          <span><span className="font-semibold text-foreground">{fmtUsers(users)}</span> traders deployed</span>
         </div>
       </div>
     </button>
@@ -453,7 +492,7 @@ function StepStrategy({ onBack, onSelect }: { onBack: () => void; onSelect: (s: 
       <div className="grid gap-4 sm:grid-cols-2">
         {STRATEGIES.map((s) => {
           const locked = !!s.locked;
-          const { returnPct, drawdown, risk, tag } = getStrategyMeta(s);
+          const { returnPct, drawdown, risk, tag, users, tested } = getStrategyMeta(s);
           const TagIcon = TAG_STYLES[tag].icon;
           return (
             <button
@@ -473,7 +512,7 @@ function StepStrategy({ onBack, onSelect }: { onBack: () => void; onSelect: (s: 
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary">
-                    <ShieldCheck className="h-3.5 w-3.5" /> Verified
+                    <ShieldCheck className="h-3.5 w-3.5" /> Verified · {tested} tested
                   </span>
                 )}
               </div>
@@ -498,20 +537,26 @@ function StepStrategy({ onBack, onSelect }: { onBack: () => void; onSelect: (s: 
                   </div>
                 </div>
 
-                {/* Stats row */}
+                {/* Stats row — drawdown highlighted */}
                 <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-surface p-2.5 text-center">
                   <div>
-                    <div className="text-[10px] text-muted-foreground">Win</div>
+                    <div className="text-[10px] text-muted-foreground">Win Rate</div>
                     <div className="text-sm font-bold">{s.winRate}%</div>
                   </div>
                   <div className="border-x border-border">
-                    <div className="text-[10px] text-muted-foreground">Drawdown</div>
-                    <div className="text-sm font-bold text-rose-500">-{drawdown}%</div>
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-rose-500/80">Max Drawdown</div>
+                    <div className="text-base font-extrabold text-rose-500">-{drawdown}%</div>
                   </div>
                   <div>
                     <div className="text-[10px] text-muted-foreground">Risk</div>
                     <div className={`mx-auto mt-0.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold ${RISK_STYLES[risk]}`}>{risk}</div>
                   </div>
+                </div>
+
+                {/* Users count */}
+                <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <User className="h-3.5 w-3.5" />
+                  <span><span className="font-semibold text-foreground">{fmtUsers(users)}</span> traders deployed this</span>
                 </div>
               </div>
 
