@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { TrendingUp, TrendingDown, Wallet, Trophy, Activity, Plus, Pause, Play, ChevronRight, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { TrendingUp, TrendingDown, Wallet, Trophy, Activity, Plus, Pause, Play, ChevronRight, ArrowUpRight, ArrowDownRight, Target, ShieldAlert, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/portfolio")({ component: Portfolio });
 
@@ -25,6 +25,26 @@ const DEPLOYMENTS: Deployment[] = [
   { id: "3", name: "Trend Continuation",type: "Trending • Option Buying", mode: "forward", pnl: -1640, pnlPct: -0.82, trades: 11, winRate: 45, capital: 200000, deployedAt: "4d ago" },
   { id: "4", name: "Iron Condor",      type: "Non-Trending • Option Selling", mode: "live", pnl: 4560, pnlPct: 1.82, trades: 9,  winRate: 78, capital: 250000, deployedAt: "6d ago" },
   { id: "5", name: "Range Hunter",     type: "Non-Trending • Option Selling", mode: "stopped", pnl: 0, pnlPct: 0,    trades: 0,  winRate: 0,  capital: 100000, deployedAt: "—" },
+];
+
+interface TradeLog {
+  id: string;
+  time: string;
+  symbol: string;
+  side: "BUY" | "SELL";
+  strategy: string;
+  outcome: "target" | "sl" | "open";
+  pnl: number;
+  reason: string;
+}
+
+const TODAY_TRADES: TradeLog[] = [
+  { id: "t1", time: "09:22", symbol: "NIFTY 24500 CE", side: "BUY",  strategy: "Momentum Breakout",  outcome: "target", pnl: 4180,  reason: "Target hit — price broke 15m resistance with 2× avg volume, booked at 1:2 RR." },
+  { id: "t2", time: "10:05", symbol: "BANKNIFTY 52000 PE", side: "BUY", strategy: "Pullback Pro",    outcome: "sl",     pnl: -1620, reason: "SL hit — pullback failed at 20-EMA, momentum flipped bullish on 5m close." },
+  { id: "t3", time: "11:18", symbol: "RELIANCE 2900 CE", side: "BUY",  strategy: "Trend Continuation", outcome: "target", pnl: 2340, reason: "Target hit — higher-high structure held, exited on RSI divergence at resistance." },
+  { id: "t4", time: "12:40", symbol: "NIFTY 24400-24700 IC", side: "SELL", strategy: "Iron Condor",   outcome: "open",   pnl: 760,   reason: "Open — premium decaying as expected, both wings safe within range." },
+  { id: "t5", time: "13:55", symbol: "HDFC 1650 PE", side: "SELL",     strategy: "Range Hunter",      outcome: "target", pnl: 1390,  reason: "Target hit — price rejected range support twice, exited at mid-range." },
+  { id: "t6", time: "14:48", symbol: "TCS 4200 CE", side: "BUY",       strategy: "Momentum Breakout", outcome: "sl",     pnl: -890,  reason: "SL hit — false breakout, price closed back inside range on rising volume." },
 ];
 
 // 30-day deterministic equity curve
@@ -116,6 +136,50 @@ function Portfolio() {
           <KPI label="Capital deployed" value={`₹${(totalCapital / 100000).toFixed(1)}L`} icon={Wallet} />
           <KPI label="Live algos" value={`${liveCount}`} icon={TrendingUp} />
         </div>
+      </section>
+
+      {/* Today's Activity Log */}
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="font-display text-lg font-bold">Today's activity</h2>
+            <p className="text-xs text-muted-foreground">Trades executed today with reasoning</p>
+          </div>
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary-soft px-2 py-0.5 text-[10px] font-bold text-primary">
+            <Clock className="h-3 w-3" /> {TODAY_TRADES.length} trades
+          </span>
+        </div>
+        <ol className="relative space-y-4 border-l border-border pl-5">
+          {TODAY_TRADES.map((t) => {
+            const isTarget = t.outcome === "target";
+            const isSL = t.outcome === "sl";
+            const Icon = isTarget ? Target : isSL ? ShieldAlert : Clock;
+            const tone = isTarget ? "text-primary bg-primary-soft" : isSL ? "text-destructive bg-destructive/10" : "text-muted-foreground bg-muted";
+            return (
+              <li key={t.id} className="relative">
+                <span className={`absolute -left-[26px] flex h-5 w-5 items-center justify-center rounded-full ${tone}`}>
+                  <Icon className="h-3 w-3" />
+                </span>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-semibold">{t.symbol}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{t.side}</span>
+                      <span className="text-[10px] text-muted-foreground">· {t.strategy}</span>
+                    </div>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{t.reason}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className={`text-sm font-bold ${t.pnl > 0 ? "text-primary" : t.pnl < 0 ? "text-destructive" : ""}`}>
+                      {t.pnl > 0 ? "+" : ""}₹{t.pnl.toLocaleString("en-IN")}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">{t.time}</div>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
       </section>
 
       {/* Top Performer */}
