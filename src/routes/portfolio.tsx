@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { TrendingUp, TrendingDown, Wallet, Trophy, Activity, Plus, Pause, Play, ChevronRight, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { TrendingUp, TrendingDown, Wallet, Trophy, Activity, Plus, Pause, Play, ChevronRight, ArrowUpRight, ArrowDownRight, Target, ShieldAlert, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/portfolio")({ component: Portfolio });
 
