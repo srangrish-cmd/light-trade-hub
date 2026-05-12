@@ -142,17 +142,6 @@ function StepDiscover({ onPickStrategy }: { onPickStrategy: (s: Strategy) => voi
         <p className="mt-2 text-sm text-muted-foreground">Hand-picked algos with verified backtests — go from learn to live in minutes.</p>
       </div>
 
-      {/* Proof points */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3">
-        {PROOF_POINTS.map((p) => (
-          <div key={p.label} className="rounded-2xl border border-border bg-card p-3 sm:p-4">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{p.label}</div>
-            <div className="mt-1 font-display text-xl font-bold sm:text-2xl text-primary">{p.value}</div>
-            <div className="mt-0.5 text-[10px] text-muted-foreground">{p.sub}</div>
-          </div>
-        ))}
-      </div>
-
       {/* Category shortcuts */}
       <div className="flex flex-wrap gap-2">
         <button
