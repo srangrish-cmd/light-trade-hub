@@ -118,6 +118,50 @@ function Portfolio() {
         </div>
       </section>
 
+      {/* Today's Activity Log */}
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="font-display text-lg font-bold">Today's activity</h2>
+            <p className="text-xs text-muted-foreground">Trades executed today with reasoning</p>
+          </div>
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary-soft px-2 py-0.5 text-[10px] font-bold text-primary">
+            <Clock className="h-3 w-3" /> {TODAY_TRADES.length} trades
+          </span>
+        </div>
+        <ol className="relative space-y-4 border-l border-border pl-5">
+          {TODAY_TRADES.map((t) => {
+            const isTarget = t.outcome === "target";
+            const isSL = t.outcome === "sl";
+            const Icon = isTarget ? Target : isSL ? ShieldAlert : Clock;
+            const tone = isTarget ? "text-primary bg-primary-soft" : isSL ? "text-destructive bg-destructive/10" : "text-muted-foreground bg-muted";
+            return (
+              <li key={t.id} className="relative">
+                <span className={`absolute -left-[26px] flex h-5 w-5 items-center justify-center rounded-full ${tone}`}>
+                  <Icon className="h-3 w-3" />
+                </span>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-semibold">{t.symbol}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{t.side}</span>
+                      <span className="text-[10px] text-muted-foreground">· {t.strategy}</span>
+                    </div>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{t.reason}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className={`text-sm font-bold ${t.pnl > 0 ? "text-primary" : t.pnl < 0 ? "text-destructive" : ""}`}>
+                      {t.pnl > 0 ? "+" : ""}₹{t.pnl.toLocaleString("en-IN")}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">{t.time}</div>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+
       {/* Top Performer */}
       {top && (
         <section className="rounded-2xl border border-border bg-gradient-to-br from-primary-soft to-card p-5">
