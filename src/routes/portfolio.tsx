@@ -27,6 +27,26 @@ const DEPLOYMENTS: Deployment[] = [
   { id: "5", name: "Range Hunter",     type: "Non-Trending • Option Selling", mode: "stopped", pnl: 0, pnlPct: 0,    trades: 0,  winRate: 0,  capital: 100000, deployedAt: "—" },
 ];
 
+interface TradeLog {
+  id: string;
+  time: string;
+  symbol: string;
+  side: "BUY" | "SELL";
+  strategy: string;
+  outcome: "target" | "sl" | "open";
+  pnl: number;
+  reason: string;
+}
+
+const TODAY_TRADES: TradeLog[] = [
+  { id: "t1", time: "09:22", symbol: "NIFTY 24500 CE", side: "BUY",  strategy: "Momentum Breakout",  outcome: "target", pnl: 4180,  reason: "Target hit — price broke 15m resistance with 2× avg volume, booked at 1:2 RR." },
+  { id: "t2", time: "10:05", symbol: "BANKNIFTY 52000 PE", side: "BUY", strategy: "Pullback Pro",    outcome: "sl",     pnl: -1620, reason: "SL hit — pullback failed at 20-EMA, momentum flipped bullish on 5m close." },
+  { id: "t3", time: "11:18", symbol: "RELIANCE 2900 CE", side: "BUY",  strategy: "Trend Continuation", outcome: "target", pnl: 2340, reason: "Target hit — higher-high structure held, exited on RSI divergence at resistance." },
+  { id: "t4", time: "12:40", symbol: "NIFTY 24400-24700 IC", side: "SELL", strategy: "Iron Condor",   outcome: "open",   pnl: 760,   reason: "Open — premium decaying as expected, both wings safe within range." },
+  { id: "t5", time: "13:55", symbol: "HDFC 1650 PE", side: "SELL",     strategy: "Range Hunter",      outcome: "target", pnl: 1390,  reason: "Target hit — price rejected range support twice, exited at mid-range." },
+  { id: "t6", time: "14:48", symbol: "TCS 4200 CE", side: "BUY",       strategy: "Momentum Breakout", outcome: "sl",     pnl: -890,  reason: "SL hit — false breakout, price closed back inside range on rising volume." },
+];
+
 // 30-day deterministic equity curve
 function buildEquity(start = 800000, days = 30) {
   const out: { d: number; v: number }[] = [];
