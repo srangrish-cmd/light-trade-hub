@@ -255,7 +255,7 @@ function AlgoRow({
         <button className="text-xs font-semibold text-primary">See all</button>
       </div>
       <div className="-mx-4 sm:-mx-6 overflow-x-auto pb-2">
-        <div className="flex gap-3 px-4 sm:px-6 snap-x snap-mandatory">
+        <div className="flex items-stretch gap-3 px-4 sm:px-6 snap-x snap-mandatory">
           {items.map((s) => (
             <AlgoTile key={s.id} strategy={s} onPick={onPick} />
           ))}
@@ -274,7 +274,7 @@ function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strate
   return (
     <button
       onClick={() => { if (!locked) onPick(strategy); else alert(`Unlock ${strategy.name} for ₹${strategy.price}`); }}
-      className="group relative flex w-[78%] sm:w-[280px] flex-shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-border bg-card text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-[var(--shadow-card)] active:scale-[0.98]"
+      className="group relative flex w-[72vw] max-w-[260px] sm:w-[260px] flex-shrink-0 snap-start flex-col self-stretch overflow-hidden rounded-2xl border border-border bg-card text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-[var(--shadow-card)] active:scale-[0.98]"
     >
       {/* Top: tag + lock */}
       <div className="flex items-center justify-between px-4 pt-3">
@@ -286,8 +286,8 @@ function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strate
             <Lock className="h-3 w-3" /> PRO
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary">
-            <ShieldCheck className="h-3 w-3" /> Verified · {tested} tested
+          <span className="inline-flex items-center gap-1 whitespace-nowrap text-[10px] font-semibold text-primary">
+            <ShieldCheck className="h-3 w-3" /> {tested} verified
           </span>
         )}
       </div>
