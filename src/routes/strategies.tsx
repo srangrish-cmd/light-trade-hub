@@ -255,7 +255,7 @@ function AlgoRow({
         <button className="text-xs font-semibold text-primary">See all</button>
       </div>
       <div className="-mx-4 sm:-mx-6 overflow-x-auto pb-2">
-        <div className="flex gap-3 px-4 sm:px-6 snap-x snap-mandatory">
+        <div className="flex items-stretch gap-3 px-4 sm:px-6 snap-x snap-mandatory">
           {items.map((s) => (
             <AlgoTile key={s.id} strategy={s} onPick={onPick} />
           ))}
