@@ -274,7 +274,7 @@ function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strate
   return (
     <button
       onClick={() => { if (!locked) onPick(strategy); else alert(`Unlock ${strategy.name} for ₹${strategy.price}`); }}
-      className="group relative flex w-[78%] sm:w-[280px] flex-shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-border bg-card text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-[var(--shadow-card)] active:scale-[0.98]"
+      className="group relative flex w-[72vw] max-w-[260px] sm:w-[260px] flex-shrink-0 snap-start flex-col self-stretch overflow-hidden rounded-2xl border border-border bg-card text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-[var(--shadow-card)] active:scale-[0.98]"
     >
       {/* Top: tag + lock */}
       <div className="flex items-center justify-between px-4 pt-3">
