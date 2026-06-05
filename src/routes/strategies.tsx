@@ -286,8 +286,8 @@ function AlgoTile({ strategy, onPick }: { strategy: Strategy; onPick: (s: Strate
             <Lock className="h-3 w-3" /> PRO
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary">
-            <ShieldCheck className="h-3 w-3" /> Verified · {tested} tested
+          <span className="inline-flex items-center gap-1 whitespace-nowrap text-[10px] font-semibold text-primary">
+            <ShieldCheck className="h-3 w-3" /> {tested} verified
           </span>
         )}
       </div>
